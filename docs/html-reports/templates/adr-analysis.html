@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>[Template] 設計判断分析</title>
+
+<meta name="report:type" content="adr-analysis">
+<meta name="report:date" content="2026-05-20">
+<meta name="report:tags" content="template,adr">
+
+<link rel="stylesheet" href="../_assets/theme.css">
+<link rel="stylesheet" href="../_assets/components.css">
+<style>
+  .options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--sp-4);
+    margin: var(--sp-4) 0;
+  }
+  .option-card {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-top: 4px solid var(--text-mute);
+    border-radius: var(--radius);
+    padding: var(--sp-4) var(--sp-5);
+  }
+  .option-card.selected {
+    border-top-color: var(--good);
+    background: linear-gradient(180deg, rgba(63, 185, 80, 0.08) 0%, var(--bg-elev) 60%);
+  }
+  .option-card.rejected {
+    border-top-color: var(--bad);
+    opacity: 0.7;
+  }
+  .option-title {
+    font-weight: 600;
+    font-size: var(--fz-md);
+    margin: 0 0 var(--sp-2);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--sp-2);
+  }
+  .option-pros, .option-cons { list-style: none; padding: 0; margin: var(--sp-2) 0; font-size: var(--fz-sm); }
+  .option-pros li::before { content: "+ "; color: var(--good); font-weight: 700; }
+  .option-cons li::before { content: "− "; color: var(--bad); font-weight: 700; }
+  .option-card h5 { margin: var(--sp-3) 0 var(--sp-1); font-size: var(--fz-xs); text-transform: uppercase; color: var(--text-dim); letter-spacing: 0.5px; }
+
+  .matrix-cell { text-align: center; font-family: var(--font-mono); }
+  .score-5 { color: var(--good); font-weight: 700; }
+  .score-4 { color: var(--good); }
+  .score-3 { color: var(--warn); }
+  .score-2 { color: var(--accent-warm); }
+  .score-1 { color: var(--bad); }
+
+  .chart-wrap {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: var(--sp-4) var(--sp-5);
+    margin: var(--sp-4) 0;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header class="report-header">
+  <h1>設計判断分析テンプレート</h1>
+  <div class="meta">
+    <span>Type: ADR Analysis</span>
+    <span>Date: YYYY-MM-DD</span>
+    <span>Related ADR: docs/adr/XXXX-...</span>
+    <span>Status: Proposed | Accepted | Rejected | Superseded</span>
+  </div>
+</header>
+
+<nav class="no-print">
+  <a href="../index.html">← Index</a>
+</nav>
+
+<!-- ============================================================
+     1. 課題 / コンテキスト
+     ============================================================ -->
+<h2>課題</h2>
+<div class="summary">
+  <p><strong>解決したい問題:</strong> 何が問題で、なぜ今判断が必要なのか。</p>
+  <p><strong>制約:</strong> 技術的・運用的・スケジュール上の制約。</p>
+  <p><strong>関連:</strong> ADR-XXXX、Issue #YY、レビュー結果へのリンク。</p>
+</div>
+
+<!-- ============================================================
+     2. 代替案 (Options) - カード比較
+     ============================================================ -->
+<h2>代替案</h2>
+<div class="options-grid">
+
+  <div class="option-card selected">
+    <div class="option-title">
+      <span>案A: IScenarioTitleProvider 抽象化</span>
+      <span class="badge badge-good">採用</span>
+    </div>
+    <p style="margin: 0; color: var(--text-dim); font-size: var(--fz-sm);">
+      Application 層に title 解決の interface を導入。locale を内包。
+    </p>
+
+    <h5>メリット</h5>
+    <ul class="option-pros">
+      <li>呼び出し側が locale を知らなくて良い</li>
+      <li>テストが容易 (mock 注入)</li>
+      <li>fallback ロジックを 1 箇所に集約</li>
+    </ul>
+
+    <h5>デメリット</h5>
+    <ul class="option-cons">
+      <li>interface が増える</li>
+      <li>DI 登録の手間</li>
+    </ul>
+  </div>
+
+  <div class="option-card">
+    <div class="option-title">
+      <span>案B: extension method 維持</span>
+      <span class="badge badge-mute">却下</span>
+    </div>
+    <p style="margin: 0; color: var(--text-dim); font-size: var(--fz-sm);">
+      現状の <code>ScenarioMetadataExtensions</code> を残す。
+    </p>
+
+    <h5>メリット</h5>
+    <ul class="option-pros">
+      <li>変更コストゼロ</li>
+      <li>追加の抽象化なし</li>
+    </ul>
+
+    <h5>デメリット</h5>
+    <ul class="option-cons">
+      <li>呼び出し側が locale を引き回す (情報漏洩)</li>
+      <li>fallback の重複実装リスク</li>
+    </ul>
+  </div>
+
+  <div class="option-card rejected">
+    <div class="option-title">
+      <span>案C: ScenarioMetadata に title 解決を移動</span>
+      <span class="badge badge-bad">却下</span>
+    </div>
+    <p style="margin: 0; color: var(--text-dim); font-size: var(--fz-sm);">
+      Domain record に locale 対応 method を生やす。
+    </p>
+
+    <h5>メリット</h5>
+    <ul class="option-pros">
+      <li>呼び出し側がシンプル</li>
+    </ul>
+
+    <h5>デメリット</h5>
+    <ul class="option-cons">
+      <li>Domain 層に locale 概念が漏れる (層越境)</li>
+      <li>純粋関数性が壊れる</li>
+      <li>CLAUDE.md NRT ポリシーと整合しづらい</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============================================================
+     3. 決定マトリクス (重み付け評価)
+     ============================================================ -->
+<h2>決定マトリクス</h2>
+<p style="color: var(--text-dim); font-size: var(--fz-sm);">
+  各観点に重みを付け、案ごとに 1〜5 でスコアリング。合計が高い案を採用。
+</p>
+<table class="report-table">
+  <thead>
+    <tr>
+      <th>観点</th>
+      <th>重み</th>
+      <th class="matrix-cell">案A</th>
+      <th class="matrix-cell">案B</th>
+      <th class="matrix-cell">案C</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>層分離の整合性</td>
+      <td>×3</td>
+      <td class="matrix-cell"><span class="score-5">5</span></td>
+      <td class="matrix-cell"><span class="score-3">3</span></td>
+      <td class="matrix-cell"><span class="score-1">1</span></td>
+    </tr>
+    <tr>
+      <td>呼び出し側の認知負荷</td>
+      <td>×2</td>
+      <td class="matrix-cell"><span class="score-5">5</span></td>
+      <td class="matrix-cell"><span class="score-2">2</span></td>
+      <td class="matrix-cell"><span class="score-5">5</span></td>
+    </tr>
+    <tr>
+      <td>テスト容易性</td>
+      <td>×2</td>
+      <td class="matrix-cell"><span class="score-5">5</span></td>
+      <td class="matrix-cell"><span class="score-3">3</span></td>
+      <td class="matrix-cell"><span class="score-2">2</span></td>
+    </tr>
+    <tr>
+      <td>導入コスト</td>
+      <td>×1</td>
+      <td class="matrix-cell"><span class="score-3">3</span></td>
+      <td class="matrix-cell"><span class="score-5">5</span></td>
+      <td class="matrix-cell"><span class="score-4">4</span></td>
+    </tr>
+    <tr style="font-weight: 700; background: var(--bg-card);">
+      <td colspan="2">合計 (加重)</td>
+      <td class="matrix-cell"><span class="score-5">38</span></td>
+      <td class="matrix-cell"><span class="score-3">24</span></td>
+      <td class="matrix-cell"><span class="score-2">19</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ============================================================
+     4. トレードオフレーダーチャート
+     ============================================================ -->
+<h2>トレードオフ可視化</h2>
+<div class="chart-wrap">
+  <h4 style="margin-top: 0;">案A / B / C を 5 軸で比較</h4>
+  <canvas id="chart-tradeoff" height="280"></canvas>
+</div>
+
+<!-- ============================================================
+     5. 決定 (Decision)
+     ============================================================ -->
+<h2>決定</h2>
+<div class="note note-good">
+  <strong>採用案:</strong> 案A (IScenarioTitleProvider 抽象化)<br>
+  決定マトリクスで最高得点 (38)。特に「層分離の整合性」と「テスト容易性」で優位。
+</div>
+
+<h3>採用理由</h3>
+<ul>
+  <li>呼び出し 4 箇所から locale 知識を除去でき、情報漏洩を解消する</li>
+  <li>Application 層に置くため、依存方向ルールに違反しない</li>
+  <li>fallback ロジックを将来拡張する余地がある</li>
+</ul>
+
+<h3>結果として生じる変更</h3>
+<ul>
+  <li><code>Application/Localization/IScenarioTitleProvider.cs</code> 新規追加</li>
+  <li><code>Infrastructure/Localization/LocaleAwareScenarioTitleProvider.cs</code> 新規追加</li>
+  <li>4 つの ScreenFlow で <code>ResolveTitle(id, locale)</code> → <code>ResolveTitle(id)</code> に置換</li>
+  <li><code>ScenarioMetadataExtensions.cs</code> 削除</li>
+</ul>
+
+<!-- ============================================================
+     6. 関連図 (採用後のクラス図)
+     ============================================================ -->
+<h2>採用後のクラス図</h2>
+<figure class="mermaid-wrap">
+  <div class="mermaid">
+classDiagram
+  class IScenarioTitleProvider {
+    +ResolveTitle(scenarioId) string
+  }
+  class LocaleAwareScenarioTitleProvider {
+    -metadataProvider
+    -localeProvider
+    +ResolveTitle(scenarioId) string
+  }
+  class MenuScreenFlow
+  class ConfirmScreenFlow
+  class TrainingScreenFlow
+  class OverviewScreenFlow
+
+  IScenarioTitleProvider <|.. LocaleAwareScenarioTitleProvider
+  MenuScreenFlow --> IScenarioTitleProvider
+  ConfirmScreenFlow --> IScenarioTitleProvider
+  TrainingScreenFlow --> IScenarioTitleProvider
+  OverviewScreenFlow --> IScenarioTitleProvider
+  </div>
+  <figcaption class="figcap">採用案: 4 ScreenFlow が IScenarioTitleProvider を共有する構成</figcaption>
+</figure>
+
+<!-- ============================================================
+     7. リスク・フォローアップ
+     ============================================================ -->
+<h2>リスク・フォローアップ</h2>
+<table class="report-table">
+  <thead>
+    <tr><th>項目</th><th>対策</th><th>担当</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>fallback ロジックの単体テスト</td>
+      <td>Application.Tests に追加</td>
+      <td>担当者</td>
+    </tr>
+    <tr>
+      <td>ADR-XXXX (locale handling) を更新</td>
+      <td>本判断を Status: Accepted で記録</td>
+      <td>担当者</td>
+    </tr>
+    <tr>
+      <td>他の同パターン (e.g., NarrationPath 解決) への波及</td>
+      <td>別 ADR で検討</td>
+      <td>後続</td>
+    </tr>
+  </tbody>
+</table>
+
+<footer class="report-footer">
+  本分析は ADR-XXXX の根拠資料として保管。決定が覆る場合は ADR 側で Status: Superseded を記録。
+</footer>
+
+</div>
+
+<script src="../_assets/reports.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  if (typeof Chart === "undefined") return;
+  Chart.defaults.color = "#8b949e";
+  Chart.defaults.borderColor = "#2d3742";
+
+  const ctx = document.getElementById("chart-tradeoff");
+  if (!ctx) return;
+  new Chart(ctx, {
+    type: "radar",
+    data: {
+      labels: ["層分離", "認知負荷低減", "テスト容易性", "導入コスト低さ", "拡張性"],
+      datasets: [
+        {
+          label: "案A (採用)",
+          data: [5, 5, 5, 3, 5],
+          backgroundColor: "rgba(63,185,80,0.2)",
+          borderColor: "#3fb950",
+          pointBackgroundColor: "#3fb950",
+        },
+        {
+          label: "案B",
+          data: [3, 2, 3, 5, 2],
+          backgroundColor: "rgba(210,153,34,0.15)",
+          borderColor: "#d29922",
+          pointBackgroundColor: "#d29922",
+        },
+        {
+          label: "案C",
+          data: [1, 5, 2, 4, 3],
+          backgroundColor: "rgba(248,81,73,0.15)",
+          borderColor: "#f85149",
+          pointBackgroundColor: "#f85149",
+        },
+      ],
+    },
+    options: {
+      scales: { r: { suggestedMin: 0, suggestedMax: 5, ticks: { stepSize: 1 } } },
+    },
+  });
+});
+</script>
+</body>
+</html>

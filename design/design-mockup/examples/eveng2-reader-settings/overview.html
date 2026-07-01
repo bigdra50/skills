@@ -1,0 +1,1504 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Flow Overview · eveng2-reader</title>
+  <style>
+    @layer tokens, base, app, canvas;
+
+    @layer tokens {
+      :root {
+        /* viewport プリセット (グローバル / CSS px) */
+        --viewport-px: 375px;
+        --viewport-h-px: 667px;
+        --bg: #0f1115;
+        --surface: #1a1d24;
+        --surface-2: #232730;
+        --border: #2d323c;
+        --text: #e6e8ed;
+        --text-dim: #9aa0ac;
+        --accent: #7fd4ff;
+        --ok: #6ee7b7;
+        --warn: #fbbf24;
+        --err: #fb7185;
+        --fav: #fbbf24;
+        --space-1: 4px;
+        --space-2: 6px;
+        --space-3: 8px;
+        --space-4: 10px;
+        --space-5: 12px;
+        --space-6: 16px;
+        --space-7: 24px;
+        --radius-sm: 4px;
+        --radius-md: 6px;
+        --radius-lg: 8px;
+        --font-sans:
+          -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", "Noto Sans JP",
+          "Segoe UI", Roboto, sans-serif;
+        --font-mono: "Menlo", "Consolas", monospace;
+        --font-size-xs: 10px;
+        --font-size-sm: 11px;
+        --font-size-md: 12px;
+        --font-size-base: 13px;
+        --font-size-lg: 14px;
+        --font-size-xl: 18px;
+        color-scheme: dark;
+      }
+    }
+
+    @layer base {
+      * { box-sizing: border-box; margin: 0; }
+      html, body {
+        background: #07080b;
+        color: var(--text);
+        font-family: var(--font-sans);
+        font-size: var(--font-size-lg);
+        line-height: 1.6;
+        min-height: 100%;
+      }
+      body { padding: 32px 16px 64px; }
+    }
+
+    @layer app {
+      .app-header h1 {
+        font-size: var(--font-size-xl);
+        letter-spacing: 0.02em;
+        margin-bottom: var(--space-5);
+      }
+      .app-header.with-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-3);
+        margin-bottom: var(--space-5);
+      }
+      .app-header.with-actions h1 { margin-bottom: 0; }
+      .icon-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: var(--space-2);
+        background: var(--surface);
+        border: 1px solid var(--border);
+        color: var(--text);
+        border-radius: var(--radius-md);
+        cursor: pointer;
+      }
+      .icon-btn:hover { background: var(--surface-2); }
+      .back-btn {
+        background: none;
+        border: none;
+        color: var(--accent);
+        font-size: var(--font-size-lg);
+        cursor: pointer;
+        padding: var(--space-1) 0;
+      }
+      .url-bar {
+        display: flex;
+        gap: var(--space-3);
+        margin-bottom: var(--space-5);
+      }
+      .url-bar input[type="url"] {
+        flex: 1;
+        min-width: 0;
+        padding: var(--space-3) var(--space-4);
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        color: var(--text);
+        font-size: var(--font-size-base);
+      }
+      .url-bar button {
+        flex-shrink: 0;
+        padding: var(--space-3) 14px;
+        background: var(--accent);
+        color: #0f1115;
+        border: none;
+        border-radius: var(--radius-md);
+        font-weight: 600;
+        font-size: var(--font-size-base);
+        cursor: pointer;
+      }
+      .url-bar button:disabled { opacity: 0.5; cursor: not-allowed; }
+      .url-bar .icon-btn { padding: 6px; }
+      .toolbar { margin-bottom: var(--space-3); }
+      .toolbar-row {
+        display: flex;
+        gap: var(--space-2);
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .toolbar-row select {
+        padding: var(--space-1) var(--space-2);
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        color: var(--text);
+        font-size: var(--font-size-md);
+      }
+      .sort-btn {
+        padding: var(--space-1) var(--space-3);
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        color: var(--text);
+        font-size: var(--font-size-md);
+        cursor: pointer;
+      }
+      .tag-filter {
+        display: flex;
+        gap: var(--space-1);
+        flex-wrap: wrap;
+        margin-top: var(--space-2);
+      }
+      .tag-chip {
+        padding: 2px var(--space-3);
+        border-radius: 10px;
+        font-size: var(--font-size-sm);
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        color: var(--text-dim);
+        cursor: pointer;
+      }
+      .tag-chip.active {
+        background: color-mix(in srgb, var(--accent) 20%, transparent);
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      .status-section {
+        margin-bottom: var(--space-4);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+      }
+      .status-section.reading {
+        border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+      }
+      .status-section.done {
+        border-color: color-mix(in srgb, var(--ok) 30%, transparent);
+      }
+      .section-header {
+        display: block;
+        width: 100%;
+        margin: 0;
+        padding: var(--space-3) var(--space-5);
+        background: var(--surface);
+        border: none;
+        color: var(--text-dim);
+        font-size: var(--font-size-md);
+        font-weight: 600;
+        text-align: left;
+      }
+      .status-section.reading .section-header {
+        background: color-mix(in srgb, var(--accent) 10%, var(--surface));
+        color: var(--accent);
+      }
+      .status-section.done .section-header {
+        background: color-mix(in srgb, var(--ok) 10%, var(--surface));
+        color: var(--ok);
+      }
+      .section-body {
+        padding: var(--space-4) var(--space-5) var(--space-5);
+        background: color-mix(in srgb, var(--surface) 50%, var(--bg));
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-5);
+      }
+      .field { display: flex; flex-direction: column; gap: var(--space-1); }
+      .field-label { font-size: var(--font-size-base); }
+      .field-control { display: flex; gap: var(--space-3); }
+      .field-control select {
+        flex: 1;
+        padding: var(--space-3) var(--space-4);
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        color: var(--text);
+        font-size: var(--font-size-base);
+      }
+      .field-hint {
+        font-size: var(--font-size-sm);
+        color: var(--text-dim);
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: var(--space-4) var(--space-5);
+        cursor: pointer;
+      }
+      .card:hover { background: var(--surface-2); border-color: var(--accent); }
+      .card-title {
+        font-weight: 600;
+        font-size: var(--font-size-base);
+        line-height: 1.4;
+      }
+      .card-meta {
+        color: var(--text-dim);
+        font-size: var(--font-size-sm);
+        margin-top: 2px;
+      }
+      .card-list {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+      }
+      .empty-msg {
+        color: var(--text-dim);
+        padding: var(--space-7) var(--space-4);
+        text-align: center;
+        font-size: var(--font-size-base);
+      }
+      .error-bar {
+        background: color-mix(in srgb, var(--err) 15%, transparent);
+        border: 1px solid color-mix(in srgb, var(--err) 40%, transparent);
+        padding: var(--space-3) var(--space-4);
+        border-radius: var(--radius-md);
+        color: var(--err);
+        font-size: var(--font-size-base);
+        margin-bottom: var(--space-5);
+      }
+      .preview-bar {
+        margin-top: var(--space-4);
+        padding: var(--space-3) var(--space-4);
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        font-family: var(--font-mono);
+        font-size: var(--font-size-xs);
+        color: var(--text-dim);
+        line-height: 1.6;
+      }
+      .preview-bar .row.hit { color: var(--accent); }
+      .preview-bar .label {
+        font-family: var(--font-sans);
+        font-size: var(--font-size-sm);
+        margin-top: var(--space-2);
+      }
+
+      /* detail-view */
+      .detail-header { margin-bottom: var(--space-5); }
+      .detail-body {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 14px;
+      }
+      .detail-title-row {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--space-3);
+      }
+      .detail-title-row h2 {
+        flex: 1;
+        font-size: var(--font-size-xl);
+        line-height: 1.4;
+      }
+      .fav-btn {
+        flex-shrink: 0;
+        background: none;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        color: var(--text-dim);
+        font-size: var(--font-size-xl);
+        cursor: pointer;
+        padding: 2px var(--space-2);
+        line-height: 1;
+      }
+      .fav-btn.active {
+        color: var(--fav);
+        border-color: var(--fav);
+      }
+      .detail-meta {
+        display: flex;
+        gap: var(--space-3);
+        color: var(--text-dim);
+        font-size: var(--font-size-sm);
+        margin: var(--space-2) 0 var(--space-3);
+      }
+      .detail-url {
+        display: block;
+        color: var(--accent);
+        font-size: var(--font-size-sm);
+        margin-bottom: var(--space-4);
+      }
+      .status-selector {
+        display: flex;
+        margin-bottom: var(--space-4);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+      }
+      .status-option {
+        flex: 1;
+        padding: var(--space-2) 0;
+        background: var(--surface);
+        border: none;
+        color: var(--text-dim);
+        font-size: var(--font-size-md);
+        cursor: pointer;
+      }
+      .status-option + .status-option { border-left: 1px solid var(--border); }
+      .status-option.active[data-value="unread"] { background: var(--surface-2); color: var(--text); font-weight: 600; }
+      .status-option.active[data-value="reading"] {
+        background: color-mix(in srgb, var(--accent) 20%, var(--surface));
+        color: var(--accent); font-weight: 600;
+      }
+      .status-option.active[data-value="done"] {
+        background: color-mix(in srgb, var(--ok) 20%, var(--surface));
+        color: var(--ok); font-weight: 600;
+      }
+      .detail-actions {
+        display: flex;
+        gap: var(--space-3);
+        margin-bottom: var(--space-6);
+      }
+      .detail-actions button {
+        padding: var(--space-2) var(--space-5);
+        border-radius: var(--radius-md);
+        font-size: var(--font-size-md);
+        cursor: pointer;
+      }
+      .detail-actions .secondary {
+        background: var(--surface-2);
+        color: var(--text);
+        border: 1px solid var(--border);
+      }
+      .primary {
+        background: var(--accent);
+        color: var(--bg);
+        border: none;
+        font-weight: 600;
+        flex: 1;
+      }
+      .btn-danger {
+        background: none;
+        color: var(--err);
+        border: 1px solid color-mix(in srgb, var(--err) 40%, transparent);
+      }
+      .text-preview {
+        padding: var(--space-4);
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        max-height: 120px;
+        overflow: hidden;
+        white-space: pre-wrap;
+        font-size: var(--font-size-md);
+        line-height: 1.5;
+        font-family: var(--font-mono);
+        color: var(--text-dim);
+      }
+
+      /* reading-view */
+      .reading-header {
+        padding: var(--space-3) 0;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: var(--space-5);
+      }
+      .reading-title {
+        font-size: 22px;
+        font-weight: 700;
+        line-height: 1.4;
+        margin-bottom: var(--space-3);
+      }
+      .reading-meta {
+        font-size: var(--font-size-base);
+        color: var(--text-dim);
+        margin-bottom: var(--space-6);
+        padding-bottom: var(--space-5);
+        border-bottom: 1px solid var(--border);
+      }
+      .reading-content {
+        font-size: 15px;
+        line-height: 1.85;
+      }
+      .reading-content p { margin-bottom: 1em; }
+    }
+
+    @layer canvas {
+      .stage {
+        max-width: 1500px;
+        margin: 0 auto;
+      }
+      .stage-head {
+        text-align: center;
+        margin-bottom: 32px;
+      }
+      .stage-head h1 {
+        font-size: 22px;
+        letter-spacing: 0.02em;
+        margin-bottom: 6px;
+      }
+      .stage-head p {
+        color: var(--text-dim);
+        font-size: 13px;
+      }
+      .stage-head a {
+        color: var(--accent);
+        text-decoration: none;
+        border-bottom: 1px solid var(--accent);
+      }
+      .play-bar {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 12px;
+        padding: 6px 14px;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        font-size: 12px;
+        color: var(--text-dim);
+      }
+      .play-bar .play-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--ok);
+        box-shadow: 0 0 8px var(--ok);
+        animation: pulse 1.6s ease-in-out infinite;
+      }
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.4; }
+      }
+      .play-bar button {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text-dim);
+        padding: 2px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        cursor: pointer;
+        font-family: var(--font-mono);
+        letter-spacing: 0.08em;
+      }
+      .play-bar button:hover { color: var(--accent); border-color: var(--accent); }
+      .play-bar button.active {
+        background: color-mix(in srgb, var(--accent) 20%, transparent);
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+      .play-bar .sep {
+        width: 1px;
+        height: 14px;
+        background: var(--border);
+        margin: 0 4px;
+      }
+      .play-bar .label {
+        color: var(--text);
+        font-family: var(--font-mono);
+        font-size: 10px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+      .viewport-controls {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 16px;
+        padding: 10px 16px;
+        background: rgba(255,255,255,0.02);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        font-size: 12px;
+      }
+      .viewport-controls .label {
+        color: var(--text-dim);
+        font-family: var(--font-mono);
+        font-size: 10px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        align-self: center;
+        margin-right: 4px;
+      }
+      .viewport-controls button {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        color: var(--text-dim);
+        padding: 4px 12px;
+        border-radius: 6px;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        cursor: pointer;
+        letter-spacing: 0.04em;
+      }
+      .viewport-controls button:hover {
+        color: var(--text);
+        border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
+      }
+      .viewport-controls button.active {
+        background: color-mix(in srgb, var(--accent) 22%, transparent);
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      .viewport-controls .device {
+        font-size: 9px;
+        color: var(--text-dim);
+        margin-left: 4px;
+      }
+      .viewport-controls button.active .device {
+        color: var(--accent);
+      }
+
+      .section-title {
+        font-size: 11px;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--text-dim);
+        margin: 48px 0 6px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--border);
+      }
+      .section-sub {
+        font-size: 12px;
+        color: var(--text-dim);
+        margin-bottom: 16px;
+      }
+
+      .canvas {
+        position: relative;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 80px 100px;
+        padding: 40px 20px 60px;
+      }
+      .node {
+        position: relative;
+        z-index: 2;
+        flex: 0 0 auto;
+        width: var(--viewport-px);
+        background: #14161c;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+        display: flex;
+        flex-direction: column;
+        transition: border-color 0.2s, box-shadow 0.2s;
+      }
+      .node.active {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 2px var(--accent), 0 12px 40px rgba(127, 212, 255, 0.25);
+      }
+
+      .node-head {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        padding: 10px 14px;
+        background: rgba(255, 255, 255, 0.025);
+        border-bottom: 1px solid var(--border);
+      }
+      .node-head .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--err);
+      }
+      .node-head .dot:nth-child(2) { background: var(--warn); }
+      .node-head .dot:nth-child(3) { background: var(--ok); }
+      .node-head .id {
+        margin-left: auto;
+        font-family: var(--font-mono);
+        font-size: 10px;
+        color: var(--text-dim);
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+      .node-head .live-tag {
+        margin-left: 6px;
+        padding: 1px 6px;
+        border-radius: 999px;
+        background: var(--ok);
+        color: #0a0c0f;
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+      }
+      .node-name {
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .node-body {
+        background: var(--bg);
+        padding: 0;
+        height: var(--viewport-h-px);
+        max-height: 80vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+        overscroll-behavior: contain;
+      }
+      .node-body .miniature {
+        width: 100%;
+        min-height: 100%;
+        padding: 14px;
+      }
+      .node-body::-webkit-scrollbar { width: 8px; height: 8px; }
+      .node-body::-webkit-scrollbar-thumb {
+        background: var(--surface-2);
+        border-radius: 4px;
+      }
+      .node-body::-webkit-scrollbar-track { background: transparent; }
+
+      .edges {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        pointer-events: none;
+      }
+      .edges path {
+        fill: none;
+        stroke: var(--text-dim);
+        stroke-width: 1.5;
+        opacity: 0.5;
+        transition: stroke 0.2s, opacity 0.2s, stroke-width 0.2s;
+      }
+      .edges path.primary { stroke: var(--accent); opacity: 0.85; }
+      .edges path.firing {
+        stroke: var(--accent);
+        stroke-width: 2.5;
+        opacity: 1;
+        animation: dash 0.6s ease-out;
+      }
+      @keyframes dash {
+        from { stroke-dasharray: 6 6; stroke-dashoffset: 24; }
+        to { stroke-dasharray: 0; stroke-dashoffset: 0; }
+      }
+      .edges .arrowhead { fill: var(--text-dim); }
+      .edges .arrowhead.primary { fill: var(--accent); }
+      .edges text {
+        fill: var(--text);
+        font-family: var(--font-mono);
+        font-size: 11px;
+        paint-order: stroke;
+        stroke: var(--bg);
+        stroke-width: 4;
+        stroke-linejoin: round;
+      }
+      .edges text.primary { fill: var(--accent); }
+
+      .matrix {
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
+      }
+      .matrix-screen-head {
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+      .matrix-screen-head h3 {
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .matrix-screen-head .id {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        color: var(--text-dim);
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+      .matrix-screen-head .count {
+        margin-left: auto;
+        font-size: 11px;
+        color: var(--text-dim);
+      }
+      .matrix-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+      .frame {
+        flex: 0 0 auto;
+        width: var(--viewport-px);
+        background: #14161c;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .frame:hover { border-color: color-mix(in srgb, var(--accent) 50%, var(--border)); }
+      .frame-head {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        background: rgba(255, 255, 255, 0.025);
+        border-bottom: 1px solid var(--border);
+        font-family: var(--font-mono);
+        font-size: 10px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--text-dim);
+      }
+      .frame-head .swatch {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--accent);
+      }
+      .frame-head .live-tag {
+        margin-left: auto;
+        padding: 1px 6px;
+        border-radius: 999px;
+        background: var(--ok);
+        color: #0a0c0f;
+        font-size: 8px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+      }
+      .frame-body {
+        background: var(--bg);
+        padding: 0;
+        height: var(--viewport-h-px);
+        max-height: 70vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+        overscroll-behavior: contain;
+      }
+      .frame-body .miniature {
+        width: 100%;
+        min-height: 100%;
+        padding: 12px;
+      }
+      .frame-body::-webkit-scrollbar { width: 8px; height: 8px; }
+      .frame-body::-webkit-scrollbar-thumb {
+        background: var(--surface-2);
+        border-radius: 4px;
+      }
+      .frame-body::-webkit-scrollbar-track { background: transparent; }
+
+      .legend {
+        margin-top: 24px;
+        padding: 16px 20px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        font-size: 12.5px;
+        color: var(--text-dim);
+      }
+      .legend strong { color: var(--text); }
+      .legend code {
+        font-family: var(--font-mono);
+        color: var(--accent);
+        font-size: 11px;
+      }
+      .legend ul { padding-left: 20px; margin-top: 6px; }
+      .legend li { margin-bottom: 4px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <header class="stage-head">
+      <h1>Flow Overview — Interactive</h1>
+      <p>
+        eveng2-reader 全画面 (List → Detail → Reading + Settings) の遷移と状態を俯瞰。
+      </p>
+      <div class="play-bar">
+        <span class="play-dot"></span>
+        LIVE — 全 frame が操作可能
+        <button id="btn-reset-all" type="button">RESET ALL</button>
+      </div>
+
+      <div class="viewport-controls" id="viewport-controls">
+        <span class="label">viewport (CSS px, w × h)</span>
+        <button type="button" data-vw="320"  data-vh="568">320×568 <span class="device">legacy</span></button>
+        <button type="button" data-vw="375"  data-vh="667" class="active">375×667 <span class="device">iPhone SE / 8</span></button>
+        <button type="button" data-vw="393"  data-vh="852">393×852 <span class="device">iPhone 14/15</span></button>
+        <button type="button" data-vw="430"  data-vh="932">430×932 <span class="device">iPhone Pro Max</span></button>
+        <button type="button" data-vw="768"  data-vh="1024">768×1024 <span class="device">iPad portrait</span></button>
+        <button type="button" data-vw="1024" data-vh="768">1024×768 <span class="device">iPad landscape</span></button>
+        <button type="button" data-vw="1280" data-vh="800">1280×800 <span class="device">laptop</span></button>
+        <button type="button" data-vw="1920" data-vh="1080">1920×1080 <span class="device">FHD desktop</span></button>
+      </div>
+    </header>
+
+    <h2 class="section-title">▸ User Flow (4 screens)</h2>
+    <p class="section-sub">
+      左上 List がエントリ。歯車 → Settings、カード → Detail、Detail の「読む」 → Reading。
+      矢印は遷移発火時に点灯。各 frame 内の値変更も即時反映 (dropdown は閉じても消えません)。
+    </p>
+
+    <div class="canvas" id="canvas">
+      <svg class="edges" id="edges" aria-hidden="true">
+        <defs>
+          <marker id="arrow-primary" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" class="arrowhead primary"/>
+          </marker>
+          <marker id="arrow-secondary" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" class="arrowhead"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+
+    <h2 class="section-title">▸ States Matrix</h2>
+    <p class="section-sub">
+      各画面の全 variant を網羅。各 frame は独立 state を持ち操作可能。
+      画面遷移系 (card click / gear / 読む / back) は Matrix では発火しません — 状態変化のみ反映。
+    </p>
+    <div class="matrix" id="matrix"></div>
+
+    <aside class="legend">
+      <p><strong>使い方</strong></p>
+      <ul>
+        <li><strong>viewport プリセット</strong>: 実機の CSS px (w×h) を切替 → <strong>frame 自体の外形が viewport に追従</strong>。auto-layout で並びも再計算される</li>
+        <li><strong>frame 内スクロール</strong>: コンテンツが viewport 高さを超えると縦スクロール (実機と同じ挙動)</li>
+        <li>※ デスクトップ域 (1280/1920) は実画面サイズだが、ページ全体に対して大きすぎるため <code>max-height: 80vh</code> で制限</li>
+        <li><strong>List ノード</strong>: ⚙ → Settings、📋 → クリップボード貼付シミュ、カードクリック → Detail</li>
+        <li><strong>Detail ノード</strong>: ★ → fav トグル、ステータスボタン → 状態変更、「読む」 → Reading、← → List</li>
+        <li><strong>Reading ノード</strong>: ← → Detail に戻る</li>
+        <li><strong>Settings ノード</strong>: select 変更 → preview-bar 即更新、⟳ → 3 (default) リセット、← → List</li>
+        <li>RESET ALL → 全 frame の state を初期化 (viewport は維持)</li>
+      </ul>
+    </aside>
+  </div>
+
+  <script>
+    // ===============================================================
+    // データ
+    // ===============================================================
+    const SAMPLE = [
+      { id: 'a1', title: 'Even Realities G2 開発入門', meta: '8,200字', status: 'reading', site: 'glass-dev.example' },
+      { id: 'a2', title: 'TypeScript で書くドメインモデル', meta: '12,400字', status: 'reading', site: 'ts-blog.example' },
+      { id: 'a3', title: 'Readability.js の精度を測る', meta: '5,930字', status: 'reading', site: 'readability.example' },
+      { id: 'a4', title: 'CSS @layer 入門', meta: '4,100字', status: 'unread', site: 'css.example' },
+      { id: 'a5', title: 'WebExtensions 開発', meta: '7,800字', status: 'done', site: 'mdn.example' },
+    ]
+    const TOTAL_SLOTS = 7
+
+    function gear() {
+      return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>`
+    }
+    function clip() {
+      return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+        <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+      </svg>`
+    }
+
+    // ===============================================================
+    // ビュー (state → HTML 純粋関数)
+    // ===============================================================
+    function listSection(title, status, items) {
+      if (items.length === 0) return ''
+      const cards = items.map((bm) => `
+        <div class="card" data-action="select-card" data-value="${bm.id}">
+          <div class="card-title">${bm.title}</div>
+          <div class="card-meta">${bm.meta}</div>
+        </div>
+      `).join('')
+      return `
+        <section class="status-section ${status}">
+          <h2 class="section-header">${title} (${items.length})</h2>
+          <div class="section-body" style="padding:6px 8px;">
+            <div class="card-list">${cards}</div>
+          </div>
+        </section>
+      `
+    }
+
+    function listView(state) {
+      const variant = state.variant ?? 'filled'
+      const loading = variant === 'loading'
+      const dis = loading ? ' disabled' : ''
+      const tags = ['tech', 'design', 'glass'].map((t) => {
+        const active = state.activeTag === t ? ' active' : ''
+        return `<button class="tag-chip${active}" data-action="toggle-tag" data-value="${t}">${t}</button>`
+      }).join('')
+
+      let body = ''
+      if (variant === 'empty') {
+        body = `<p class="empty-msg">記事がありません。<br/>URLを登録してください。</p>`
+      } else if (variant === 'filtered') {
+        const f = SAMPLE.filter((b) => b.status === 'reading').slice(0, 1)
+        body = listSection('読書中', 'reading', f)
+      } else {
+        body = `
+          ${listSection('読書中', 'reading', SAMPLE.filter((b) => b.status === 'reading'))}
+          ${listSection('未読', 'unread', SAMPLE.filter((b) => b.status === 'unread'))}
+          ${listSection('読了', 'done', SAMPLE.filter((b) => b.status === 'done'))}
+        `
+      }
+
+      const errorBar = variant === 'error'
+        ? `<div class="error-bar">抽出失敗: 有効なURLを入力してください</div>`
+        : ''
+
+      return `
+        <header class="app-header with-actions">
+          <h1>ER Article Reader</h1>
+          <button class="icon-btn" data-action="open-settings"
+                  title="設定を開く" aria-label="設定を開く">${gear()}</button>
+        </header>
+        <div class="url-bar">
+          <input type="url" placeholder="記事のURLを貼り付け..." value="${state.url ?? ''}"
+                 ${dis} data-action="input-url" data-noselect />
+          <button class="icon-btn" data-action="paste-add"${dis ? ' disabled' : ''}
+                  title="クリップボードから登録">${clip()}</button>
+          <button${dis} data-action="register">${loading ? '抽出中...' : '登録'}</button>
+        </div>
+        ${errorBar}
+        <div class="toolbar">
+          <div class="toolbar-row">
+            <select data-noaction><option>登録日</option></select>
+            <button class="sort-btn" data-noaction>↓</button>
+          </div>
+          <div class="tag-filter">${tags}</div>
+        </div>
+        ${body}
+      `
+    }
+
+    function detailView(state) {
+      const bm = SAMPLE.find((b) => b.id === state.selectedId) ?? SAMPLE[0]
+      const fav = state.fav ?? false
+      const status = state.status ?? bm.status
+      const statusBtn = (val, label) =>
+        `<button class="status-option${status === val ? ' active' : ''}"
+                 data-action="set-status" data-value="${val}">${label}</button>`
+      return `
+        <header class="detail-header">
+          <button class="back-btn" data-action="back">← 戻る</button>
+        </header>
+        <div class="detail-body">
+          <div class="detail-title-row">
+            <h2>${bm.title}</h2>
+            <button class="fav-btn${fav ? ' active' : ''}" data-action="toggle-fav">★</button>
+          </div>
+          <div class="detail-meta">${bm.site} · ${bm.meta}</div>
+          <a class="detail-url">https://${bm.site}/${bm.id}</a>
+          <div class="status-selector">
+            ${statusBtn('unread', '未読')}
+            ${statusBtn('reading', '読書中')}
+            ${statusBtn('done', '読了')}
+          </div>
+          <div class="detail-actions">
+            <button class="primary" data-action="open-reading">読む</button>
+            <button class="secondary" data-action="update">更新</button>
+            <button class="secondary btn-danger" data-action="delete">削除</button>
+          </div>
+          <section>
+            <div class="text-preview">本文プレビュー (先頭2000字)\n\nEven Realities G2 はマイクロLEDの単色ディスプレイを搭載した次世代のスマートグラス...</div>
+          </section>
+        </div>
+      `
+    }
+
+    function readingView(state) {
+      const bm = SAMPLE.find((b) => b.id === state.selectedId) ?? SAMPLE[0]
+      return `
+        <div class="reading-header">
+          <button class="back-btn" data-action="back">← 戻る</button>
+        </div>
+        <div class="reading-body">
+          <h1 class="reading-title">${bm.title}</h1>
+          <div class="reading-meta">${bm.site}</div>
+          <article class="reading-content">
+            <p>Even Realities G2 はマイクロLEDの単色ディスプレイを搭載した次世代のスマートグラスです。視野中央に静かに浮かぶ情報レイヤーは読書アプリと相性が良く...</p>
+            <p>本記事ではコンパニオンアプリの実装から、R1 リング操作によるページ送り、CJK プリセットの自動切替までを順に解説します。</p>
+            <p>まず R1 リングの回転検出について。SDK は HIGHLIGHT_MOVE イベントを発火させるため...</p>
+          </article>
+        </div>
+      `
+    }
+
+    function previewBar(scrollLines) {
+      const rows = []
+      for (let i = 0; i < TOTAL_SLOTS; i++) {
+        const hit = i < scrollLines
+        rows.push(`<div class="row${hit ? ' hit' : ''}">${hit ? '▓▓▓▓▓▓' : '░░░░░░'} L${i + 1}</div>`)
+      }
+      return `
+        <div class="preview-bar" aria-live="polite">
+          ${rows.join('')}
+          <div class="label">→ <strong style="color:var(--accent);">${scrollLines}</strong> / ${TOTAL_SLOTS} 行/tick</div>
+        </div>
+      `
+    }
+
+    function settingsView(state) {
+      const sl = state.scrollLines ?? 3
+      const opts = [1, 2, 3, 5, 7].map((n) => {
+        const sel = n === sl ? ' selected' : ''
+        const label = n === 3 ? '3 行 (デフォルト)' : n === 7 ? '7 行 (1ページ)' : `${n} 行`
+        return `<option value="${n}"${sel}>${label}</option>`
+      }).join('')
+
+      return `
+        <header class="app-header with-actions">
+          <button class="back-btn" data-action="back">← 戻る</button>
+          <h1 style="font-size:14px;">設定</h1>
+          <button class="icon-btn" data-action="reset"
+                  title="初期値に戻す" aria-label="初期値に戻す">⟳</button>
+        </header>
+        <section class="status-section">
+          <h2 class="section-header">G2 グラス</h2>
+          <div class="section-body">
+            <div class="field">
+              <label class="field-label" for="setting-${state.frameKey}">スクロール行数</label>
+              <div class="field-control">
+                <select id="setting-${state.frameKey}" data-action="change-scroll">${opts}</select>
+              </div>
+              <p class="field-hint">R1 ティック1回あたりに進む行数 (1ページ = 7行)</p>
+            </div>
+            ${previewBar(sl)}
+          </div>
+        </section>
+      `
+    }
+
+    // ===============================================================
+    // 状態
+    // ===============================================================
+    function defaultListState(variant = 'filled') {
+      return { kind: 'list', variant, url: '', activeTag: null }
+    }
+    function defaultDetailState(selectedId = 'a1') {
+      return { kind: 'detail', selectedId, fav: false, status: 'reading' }
+    }
+    function defaultReadingState(selectedId = 'a1') {
+      return { kind: 'reading', selectedId }
+    }
+    function defaultSettingsState() {
+      return { kind: 'settings', scrollLines: 3 }
+    }
+
+    // フロー図 (4ノード)
+    const flowFrames = [
+      { key: 'flow:list',     area: 'A', name: 'List View',  initial: () => defaultListState() },
+      { key: 'flow:detail',   area: 'B', name: 'Detail',     initial: () => defaultDetailState() },
+      { key: 'flow:reading',  area: 'C', name: 'Reading',    initial: () => defaultReadingState() },
+      { key: 'flow:settings', area: 'D', name: 'Settings',   initial: () => defaultSettingsState() },
+    ]
+
+    // States Matrix (各画面 × 全 variants)
+    const matrixScreens = [
+      {
+        id: 'list', name: 'List View',
+        frames: [
+          { key: 'matrix:list:filled',   variantName: 'filled',   state: () => defaultListState('filled') },
+          { key: 'matrix:list:empty',    variantName: 'empty',    state: () => defaultListState('empty') },
+          { key: 'matrix:list:loading',  variantName: 'loading',  state: () => defaultListState('loading') },
+          { key: 'matrix:list:error',    variantName: 'error',    state: () => defaultListState('error') },
+          { key: 'matrix:list:filtered', variantName: 'filtered', state: () => ({ ...defaultListState('filtered'), activeTag: 'glass' }) },
+        ],
+      },
+      {
+        id: 'detail', name: 'Detail',
+        frames: [
+          { key: 'matrix:detail:unread',  variantName: 'unread',  state: () => ({ ...defaultDetailState('a1'), status: 'unread' }) },
+          { key: 'matrix:detail:reading', variantName: 'reading', state: () => ({ ...defaultDetailState('a1'), status: 'reading' }) },
+          { key: 'matrix:detail:done',    variantName: 'done',    state: () => ({ ...defaultDetailState('a1'), status: 'done' }) },
+          { key: 'matrix:detail:fav',     variantName: 'favorite',state: () => ({ ...defaultDetailState('a2'), fav: true }) },
+        ],
+      },
+      {
+        id: 'reading', name: 'Reading',
+        frames: [
+          { key: 'matrix:reading:a1', variantName: 'article 1', state: () => defaultReadingState('a1') },
+          { key: 'matrix:reading:a2', variantName: 'article 2', state: () => defaultReadingState('a2') },
+        ],
+      },
+      {
+        id: 'settings', name: 'Settings',
+        frames: [
+          { key: 'matrix:set:1', variantName: 'min (1)',    state: () => ({ kind: 'settings', scrollLines: 1 }) },
+          { key: 'matrix:set:2', variantName: 'two (2)',    state: () => ({ kind: 'settings', scrollLines: 2 }) },
+          { key: 'matrix:set:3', variantName: 'default(3)', state: () => ({ kind: 'settings', scrollLines: 3 }) },
+          { key: 'matrix:set:5', variantName: 'five (5)',   state: () => ({ kind: 'settings', scrollLines: 5 }) },
+          { key: 'matrix:set:7', variantName: 'max (7)',    state: () => ({ kind: 'settings', scrollLines: 7 }) },
+        ],
+      },
+    ]
+
+    const frameStates = new Map()
+    function initFrameStates() {
+      frameStates.clear()
+      for (const f of flowFrames) {
+        frameStates.set(f.key, { ...f.initial(), frameKey: f.key })
+      }
+      for (const s of matrixScreens) {
+        for (const f of s.frames) {
+          frameStates.set(f.key, { ...f.state(), frameKey: f.key })
+        }
+      }
+    }
+    initFrameStates()
+
+    let flowActive = 'flow:list'
+    // フロー図の各画面で「現在見ている」記事 ID は flow 全体で共有
+    let flowSelectedId = 'a1'
+
+    // ===============================================================
+    // ルータ
+    // ===============================================================
+    function renderState(state) {
+      switch (state.kind) {
+        case 'detail':   return detailView(state)
+        case 'reading':  return readingView(state)
+        case 'settings': return settingsView(state)
+        default:         return listView(state)
+      }
+    }
+
+    // ===============================================================
+    // フロー図
+    // ===============================================================
+    const canvas = document.getElementById('canvas')
+    const edgesSvg = document.getElementById('edges')
+
+    function syncFlowSelection() {
+      // selectedId の変更を flow:detail / flow:reading の state に反映
+      const detail = frameStates.get('flow:detail')
+      const reading = frameStates.get('flow:reading')
+      if (detail) detail.selectedId = flowSelectedId
+      if (reading) reading.selectedId = flowSelectedId
+    }
+
+    function renderNode(frame) {
+      const state = frameStates.get(frame.key)
+      const isActive = flowActive === frame.key
+      return `
+        <article class="node${isActive ? ' active' : ''}"
+                 data-area="${frame.area}" data-frame-key="${frame.key}">
+          <div class="node-head">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="node-name">${frame.name}</span>
+            <span class="id">${frame.key.split(':').pop()}</span>
+          </div>
+          <div class="node-body">
+            <div class="miniature">${renderState(state)}</div>
+          </div>
+        </article>
+      `
+    }
+    function buildCanvas() {
+      syncFlowSelection()
+      for (const n of canvas.querySelectorAll('.node')) n.remove()
+      for (const f of flowFrames) {
+        canvas.insertAdjacentHTML('beforeend', renderNode(f))
+      }
+    }
+
+    // ===============================================================
+    // States Matrix
+    // ===============================================================
+    function renderFrame(frame) {
+      const state = frameStates.get(frame.key)
+      return `
+        <article class="frame" data-frame-key="${frame.key}">
+          <div class="frame-head">
+            <span class="swatch"></span>
+            ${frame.variantName}
+          </div>
+          <div class="frame-body">
+            <div class="miniature">${renderState(state)}</div>
+          </div>
+        </article>
+      `
+    }
+    function buildMatrix() {
+      const root = document.getElementById('matrix')
+      root.innerHTML = ''
+      for (const screen of matrixScreens) {
+        const wrap = document.createElement('section')
+        wrap.innerHTML = `
+          <header class="matrix-screen-head">
+            <h3>${screen.name}</h3>
+            <span class="id">${screen.id}</span>
+            <span class="count">${screen.frames.length} variants</span>
+          </header>
+          <div class="matrix-row">
+            ${screen.frames.map(renderFrame).join('')}
+          </div>
+        `
+        root.appendChild(wrap)
+      }
+    }
+
+    // ===============================================================
+    // エッジ (4ノード分)
+    // ===============================================================
+    const flowEdges = [
+      { from: 'flow:list',    to: 'flow:detail',   label: 'card', kind: 'primary',
+        side: { from: 'right', to: 'left' }, offset: -16 },
+      { from: 'flow:detail',  to: 'flow:list',     label: '← back', kind: 'primary',
+        side: { from: 'left', to: 'right' }, offset: 16 },
+      { from: 'flow:detail',  to: 'flow:reading',  label: '読む', kind: 'primary',
+        side: { from: 'bottom', to: 'top' }, offset: -16 },
+      { from: 'flow:reading', to: 'flow:detail',   label: '← back', kind: 'primary',
+        side: { from: 'top', to: 'bottom' }, offset: 16 },
+      { from: 'flow:list',    to: 'flow:settings', label: '⚙', kind: 'secondary',
+        side: { from: 'bottom', to: 'top' }, offset: -16 },
+      { from: 'flow:settings',to: 'flow:list',     label: '← back', kind: 'secondary',
+        side: { from: 'top', to: 'bottom' }, offset: 16 },
+    ]
+
+    function anchor(rect, side, parent) {
+      const x = rect.left - parent.left
+      const y = rect.top - parent.top
+      switch (side) {
+        case 'top':    return { x: x + rect.width / 2, y }
+        case 'bottom': return { x: x + rect.width / 2, y: y + rect.height }
+        case 'left':   return { x, y: y + rect.height / 2 }
+        case 'right':  return { x: x + rect.width, y: y + rect.height / 2 }
+      }
+    }
+    function curve(p1, p2) {
+      const dx = p2.x - p1.x
+      const dy = p2.y - p1.y
+      const handle = Math.max(40, Math.min(140, Math.abs(dx) * 0.45 + Math.abs(dy) * 0.45))
+      const isHoriz = Math.abs(dx) > Math.abs(dy)
+      const c1 = isHoriz
+        ? { x: p1.x + Math.sign(dx) * handle, y: p1.y }
+        : { x: p1.x, y: p1.y + Math.sign(dy) * handle }
+      const c2 = isHoriz
+        ? { x: p2.x - Math.sign(dx) * handle, y: p2.y }
+        : { x: p2.x, y: p2.y - Math.sign(dy) * handle }
+      return `M ${p1.x} ${p1.y} C ${c1.x} ${c1.y}, ${c2.x} ${c2.y}, ${p2.x} ${p2.y}`
+    }
+    function midPoint(p1, p2) {
+      return { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 }
+    }
+
+    function drawEdges(firingIdx = -1) {
+      for (const el of [...edgesSvg.querySelectorAll('g.edge')]) el.remove()
+      const parent = canvas.getBoundingClientRect()
+      edgesSvg.setAttribute('width', parent.width)
+      edgesSvg.setAttribute('height', parent.height)
+      edgesSvg.setAttribute('viewBox', `0 0 ${parent.width} ${parent.height}`)
+
+      const nodeMap = new Map()
+      for (const n of canvas.querySelectorAll('.node')) {
+        nodeMap.set(n.dataset.frameKey, n.getBoundingClientRect())
+      }
+      flowEdges.forEach((e, idx) => {
+        const fromRect = nodeMap.get(e.from)
+        const toRect = nodeMap.get(e.to)
+        if (!fromRect || !toRect) return
+        const p1 = anchor(fromRect, e.side.from, parent)
+        const p2 = anchor(toRect, e.side.to, parent)
+        if (e.offset) {
+          if (e.side.from === 'left' || e.side.from === 'right') {
+            p1.y += e.offset; p2.y += e.offset
+          } else {
+            p1.x += e.offset; p2.x += e.offset
+          }
+        }
+        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+        g.classList.add('edge')
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+        path.setAttribute('d', curve(p1, p2))
+        if (e.kind === 'primary') path.classList.add('primary')
+        if (idx === firingIdx) path.classList.add('firing')
+        path.setAttribute('marker-end', `url(#arrow-${e.kind || 'secondary'})`)
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text')
+        const mid = midPoint(p1, p2)
+        text.setAttribute('x', mid.x)
+        text.setAttribute('y', mid.y - 6)
+        text.setAttribute('text-anchor', 'middle')
+        if (e.kind === 'primary') text.classList.add('primary')
+        text.textContent = e.label
+        g.appendChild(path)
+        g.appendChild(text)
+        edgesSvg.appendChild(g)
+      })
+    }
+
+    // ===============================================================
+    // イベント delegation
+    // ===============================================================
+    function findFrameKey(target) {
+      const root = target.closest('[data-frame-key]')
+      return root?.dataset?.frameKey ?? null
+    }
+    function fireEdge(fromKey, toKey) {
+      const idx = flowEdges.findIndex((e) => e.from === fromKey && e.to === toKey)
+      drawEdges(idx)
+      setTimeout(() => drawEdges(), 600)
+    }
+    function rerender() {
+      buildCanvas()
+      buildMatrix()
+      drawEdges()
+    }
+
+    // フロー図内のみで効く遷移系アクション
+    function isFlowFrame(frameKey) {
+      return frameKey.startsWith('flow:')
+    }
+
+    function handleAction(action, target, frameKey) {
+      const state = frameStates.get(frameKey)
+      if (!state) return
+      const inFlow = isFlowFrame(frameKey)
+
+      switch (action) {
+        case 'open-settings':
+          if (inFlow) {
+            flowActive = 'flow:settings'
+            fireEdge('flow:list', 'flow:settings')
+          }
+          break
+
+        case 'paste-add':
+          state.url = 'https://example.com/pasted-article'
+          // register と同じく loading → filled の流れ
+          state.variant = 'loading'
+          rerender()
+          if (inFlow) setTimeout(() => {
+            state.variant = 'filled'; state.url = ''; rerender()
+          }, 1000)
+          else setTimeout(() => {
+            state.variant = 'filled'; state.url = ''; rerender()
+          }, 1000)
+          return
+
+        case 'select-card':
+          if (inFlow) {
+            flowSelectedId = target.dataset.value
+            flowActive = 'flow:detail'
+            fireEdge('flow:list', 'flow:detail')
+          } else {
+            // matrix 内の selectedId を更新 (該当 frame だけ)
+            if (state.kind === 'detail' || state.kind === 'reading') {
+              state.selectedId = target.dataset.value
+            }
+          }
+          break
+
+        case 'open-reading':
+          if (inFlow) {
+            flowActive = 'flow:reading'
+            fireEdge('flow:detail', 'flow:reading')
+          }
+          break
+
+        case 'back':
+          if (inFlow) {
+            if (state.kind === 'detail')   { flowActive = 'flow:list';   fireEdge('flow:detail',   'flow:list') }
+            else if (state.kind === 'reading')  { flowActive = 'flow:detail'; fireEdge('flow:reading',  'flow:detail') }
+            else if (state.kind === 'settings') { flowActive = 'flow:list';   fireEdge('flow:settings', 'flow:list') }
+          }
+          break
+
+        case 'change-scroll': {
+          const n = Number(target.value)
+          if (Number.isFinite(n)) state.scrollLines = n
+          break
+        }
+
+        case 'reset':
+          if (state.kind === 'settings') state.scrollLines = 3
+          break
+
+        case 'register': {
+          if (state.kind !== 'list') break
+          if (!state.url || !state.url.startsWith('http')) {
+            state.variant = 'error'
+          } else {
+            state.variant = 'loading'
+            rerender()
+            setTimeout(() => { state.variant = 'filled'; state.url = ''; rerender() }, 1200)
+            return
+          }
+          break
+        }
+
+        case 'toggle-tag': {
+          const tag = target.dataset.value
+          state.activeTag = state.activeTag === tag ? null : tag
+          state.variant = state.activeTag ? 'filtered' : 'filled'
+          break
+        }
+
+        case 'toggle-fav':
+          if (state.kind === 'detail') state.fav = !state.fav
+          break
+
+        case 'set-status':
+          if (state.kind === 'detail') state.status = target.dataset.value
+          break
+
+        case 'update':
+        case 'delete':
+          // モックでは noop
+          break
+      }
+
+      rerender()
+    }
+
+    // click ハンドラ — select / input / data-noaction はスキップして dropdown が閉じない
+    document.addEventListener('click', (e) => {
+      const target = e.target.closest('[data-action]')
+      if (!target) return
+      if (target.tagName === 'SELECT') return         // select は change で処理
+      if (target.tagName === 'INPUT') return          // input も click では処理しない
+      if (target.disabled) return
+      handleAction(target.dataset.action, target, findFrameKey(target))
+    })
+
+    // change ハンドラ — select の確定後 / disabled 状態回避
+    document.addEventListener('change', (e) => {
+      const target = e.target.closest('[data-action]')
+      if (!target) return
+      handleAction(target.dataset.action, target, findFrameKey(target))
+    })
+
+    // input ハンドラ — テキスト入力中は state だけ更新 (rerender しないとフォーカスが飛ぶ)
+    document.addEventListener('input', (e) => {
+      const target = e.target.closest('[data-action="input-url"]')
+      if (!target) return
+      const state = frameStates.get(findFrameKey(target))
+      if (state) state.url = target.value
+    })
+
+    document.getElementById('btn-reset-all').addEventListener('click', () => {
+      initFrameStates()
+      flowActive = 'flow:list'
+      flowSelectedId = 'a1'
+      rerender()
+    })
+
+    // ===============================================================
+    // viewport プリセット切替
+    // ===============================================================
+    const viewportControls = document.getElementById('viewport-controls')
+    viewportControls.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-vw]')
+      if (!btn) return
+      document.documentElement.style.setProperty('--viewport-px',   `${btn.dataset.vw}px`)
+      document.documentElement.style.setProperty('--viewport-h-px', `${btn.dataset.vh}px`)
+      for (const b of viewportControls.querySelectorAll('button[data-vw]')) {
+        b.classList.toggle('active', b === btn)
+      }
+      // viewport が変わると node の物理サイズが変わり、wrap 配置も変わるので矢印再描画
+      requestAnimationFrame(() => drawEdges())
+      setTimeout(() => drawEdges(), 50)
+    })
+
+    // ===============================================================
+    // boot
+    // ===============================================================
+    rerender()
+    new ResizeObserver(() => drawEdges()).observe(canvas)
+    window.addEventListener('resize', () => drawEdges())
+  </script>
+</body>
+</html>

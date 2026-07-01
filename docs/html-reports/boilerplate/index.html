@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>.reports — Index</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="_assets/theme.css">
+<link rel="stylesheet" href="_assets/components.css">
+<style>
+  .toolbar {
+    display: flex;
+    gap: var(--sp-3);
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: var(--sp-6);
+  }
+  .toolbar input[type="search"] {
+    flex: 1 1 280px;
+    min-width: 240px;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: var(--sp-2) var(--sp-3);
+    border-radius: var(--radius-sm);
+    font-size: var(--fz-base);
+    font-family: var(--font-sans);
+  }
+  .toolbar input[type="search"]::placeholder { color: var(--text-mute); }
+  .toolbar input[type="search"]:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  .filters {
+    display: flex;
+    gap: var(--sp-1);
+    flex-wrap: wrap;
+  }
+  .filter-btn {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: var(--sp-1) var(--sp-3);
+    border-radius: var(--radius-sm);
+    font-size: var(--fz-sm);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .filter-btn:hover { color: var(--text); border-color: var(--text-dim); }
+  .filter-btn.active {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+
+  .report-list { display: flex; flex-direction: column; gap: var(--sp-3); }
+
+  .report-card {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: var(--radius);
+    padding: var(--sp-4) var(--sp-5);
+    display: grid;
+    grid-template-columns: 100px 1fr auto;
+    gap: var(--sp-4);
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.15s, border-color 0.15s;
+  }
+  .report-card:hover {
+    transform: translateY(-1px);
+    border-left-color: var(--accent-warm);
+    text-decoration: none;
+  }
+
+  .report-card.type-review { border-left-color: var(--type-review); }
+  .report-card.type-plan { border-left-color: var(--type-plan); }
+  .report-card.type-audit { border-left-color: var(--type-audit); }
+  .report-card.type-adr-analysis { border-left-color: var(--type-adr); }
+
+  .report-date {
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    font-size: var(--fz-sm);
+    text-align: left;
+    padding-top: 2px;
+  }
+
+  .report-main { min-width: 0; }
+  .report-title {
+    margin: 0 0 var(--sp-1);
+    font-size: var(--fz-md);
+    font-weight: 600;
+    color: var(--text);
+  }
+  .report-summary {
+    color: var(--text-dim);
+    font-size: var(--fz-sm);
+    margin: 0 0 var(--sp-2);
+  }
+  .report-tags { display: flex; gap: var(--sp-1); flex-wrap: wrap; }
+
+  .report-meta {
+    text-align: right;
+    color: var(--text-mute);
+    font-size: var(--fz-xs);
+  }
+  .report-type {
+    display: inline-block;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-weight: 600;
+  }
+  .report-type.review { background: rgba(88,166,255,.15); color: var(--type-review); }
+  .report-type.plan { background: rgba(63,185,80,.15); color: var(--type-plan); }
+  .report-type.audit { background: rgba(240,136,62,.15); color: var(--type-audit); }
+  .report-type.adr-analysis { background: rgba(163,113,247,.15); color: var(--type-adr); }
+  .report-author { display: block; margin-top: var(--sp-1); }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: var(--sp-3);
+    margin-bottom: var(--sp-6);
+  }
+  .stat {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: var(--sp-3) var(--sp-4);
+  }
+  .stat-label {
+    color: var(--text-dim);
+    font-size: var(--fz-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .stat-value {
+    font-size: var(--fz-xl);
+    font-weight: 700;
+    font-family: var(--font-mono);
+    color: var(--text);
+  }
+
+  .empty {
+    text-align: center;
+    color: var(--text-dim);
+    padding: var(--sp-12);
+    background: var(--bg-elev);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+  }
+
+  @media (max-width: 720px) {
+    .report-card {
+      grid-template-columns: 1fr;
+    }
+    .report-meta { text-align: left; }
+  }
+</style>
+</head>
+<body>
+<div class="container container-wide">
+
+<header class="report-header">
+  <h1>.reports / Index</h1>
+  <div class="meta">
+    <span>レビュー・実装計画・品質監査・設計判断分析のカタログ</span>
+  </div>
+</header>
+
+<div class="stats" id="stats"></div>
+
+<div class="toolbar">
+  <input type="search" id="q" placeholder="タイトル・タグ・要約で検索...">
+  <div class="filters" id="filters">
+    <button class="filter-btn active" data-type="">All</button>
+    <button class="filter-btn" data-type="review">Review</button>
+    <button class="filter-btn" data-type="plan">Plan</button>
+    <button class="filter-btn" data-type="audit">Audit</button>
+    <button class="filter-btn" data-type="adr-analysis">ADR</button>
+  </div>
+</div>
+
+<div class="report-list" id="list"></div>
+
+<footer class="report-footer">
+  新規レポートを追加するには <code>_index.js</code> の <code>REPORTS_INDEX</code> 配列にエントリを追記してください。
+</footer>
+
+</div>
+
+<script src="_index.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  const list = document.getElementById("list");
+  const q = document.getElementById("q");
+  const filters = document.getElementById("filters");
+  const statsEl = document.getElementById("stats");
+
+  let activeType = "";
+  let activeQuery = "";
+
+  function renderStats(entries) {
+    const counts = entries.reduce((acc, e) => {
+      acc.total++;
+      acc[e.type] = (acc[e.type] || 0) + 1;
+      return acc;
+    }, { total: 0 });
+
+    statsEl.innerHTML = `
+      <div class="stat"><div class="stat-label">Total</div><div class="stat-value">${counts.total}</div></div>
+      <div class="stat"><div class="stat-label">Review</div><div class="stat-value">${counts.review || 0}</div></div>
+      <div class="stat"><div class="stat-label">Plan</div><div class="stat-value">${counts.plan || 0}</div></div>
+      <div class="stat"><div class="stat-label">Audit</div><div class="stat-value">${counts.audit || 0}</div></div>
+      <div class="stat"><div class="stat-label">ADR Analysis</div><div class="stat-value">${counts["adr-analysis"] || 0}</div></div>
+    `;
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, (c) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    }[c]));
+  }
+
+  function matches(entry) {
+    if (activeType && entry.type !== activeType) return false;
+    if (!activeQuery) return true;
+    const hay = [
+      entry.title, entry.summary, entry.id,
+      ...(entry.tags || []),
+      entry.author || "",
+    ].join(" ").toLowerCase();
+    return hay.includes(activeQuery.toLowerCase());
+  }
+
+  function render() {
+    const all = (window.REPORTS_INDEX || []).slice();
+    // Sort: newest first, but templates last
+    all.sort((a, b) => {
+      if ((a.status === "template") !== (b.status === "template")) {
+        return a.status === "template" ? 1 : -1;
+      }
+      return (b.date || "").localeCompare(a.date || "");
+    });
+
+    renderStats(all.filter((e) => e.status !== "template"));
+
+    const filtered = all.filter(matches);
+    if (filtered.length === 0) {
+      list.innerHTML = `<div class="empty">該当するレポートがありません。</div>`;
+      return;
+    }
+
+    list.innerHTML = filtered.map((e) => {
+      const tags = (e.tags || []).map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join("");
+      const statusBadge = e.status && e.status !== "done"
+        ? `<span class="badge badge-${e.status === "draft" ? "warn" : e.status === "in-progress" ? "info" : "mute"}">${escapeHtml(e.status)}</span>`
+        : "";
+      return `
+        <a class="report-card type-${e.type}" href="${escapeHtml(e.path)}">
+          <div class="report-date">${escapeHtml(e.date || "—")}</div>
+          <div class="report-main">
+            <h3 class="report-title">${escapeHtml(e.title)} ${statusBadge}</h3>
+            <p class="report-summary">${escapeHtml(e.summary || "")}</p>
+            <div class="report-tags">${tags}</div>
+          </div>
+          <div class="report-meta">
+            <span class="report-type ${e.type}">${escapeHtml(e.type)}</span>
+            ${e.author ? `<span class="report-author">${escapeHtml(e.author)}</span>` : ""}
+          </div>
+        </a>
+      `;
+    }).join("");
+  }
+
+  // Wire events
+  q.addEventListener("input", (e) => { activeQuery = e.target.value; render(); });
+  filters.addEventListener("click", (e) => {
+    const btn = e.target.closest(".filter-btn");
+    if (!btn) return;
+    filters.querySelectorAll(".filter-btn").forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    activeType = btn.dataset.type;
+    render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

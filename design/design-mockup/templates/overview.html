@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="ja">
+<!--
+  design-mockup スキルの骨格テンプレート (skeleton)。
+
+  ## 設計方針
+  - 「触らなくていい generic 基盤」と「project ごとに書き換える specific 部分」を明確に分離
+  - generic 基盤: @layer tokens/base/canvas, drawEdges, anchor, curve, frameStates,
+    viewport-controls, event delegation, ResizeObserver
+  - specific 部分: tokens の値, view 関数群, flowFrames, matrixScreens, flowEdges, SAMPLE
+  - **完成例は examples/ にあるが、絶対に「画面構造」を流用しない** (examples は generic 基盤と
+    「state→HTML 純粋関数」パターンを学ぶためのもの。view 関数の具体構造はプロジェクト固有)
+
+  ## 書き換え手順
+  1. tokens.css 等から `:root` を抽出して下記 :root に上書き (なければデフォルト維持)
+  2. SAMPLE をプロジェクトのドメインデータに置換
+  3. genericCardView を、プロジェクトの画面ごとに renderXxxView(state) として置換
+     - 画面が複数あるなら関数も複数: renderHomeView / renderDetailView / renderEditorView ...
+     - 各 view は state を引数に取り HTML 文字列を返す純粋関数
+  4. flowFrames に画面ノードを定義 (area: A/B/C/D で grid 配置 — flex-wrap なので順序のみ)
+  5. matrixScreens に各画面の variants を定義
+  6. flowEdges に画面間遷移を定義
+  7. renderState() の switch に kind を追加
+  8. handleAction() の switch に project の action を追加 (back / select / submit / 等)
+-->
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Flow Overview · {{PROJECT_NAME}}</title>
+  <style>
+    @layer tokens, base, app, canvas;
+
+    /* === tokens (project の :root をここに上書き) === */
+    @layer tokens {
+      :root {
+        --viewport-px: 375px;
+        --viewport-h-px: 667px;
+        --bg: #0f1115;
+        --surface: #1a1d24;
+        --surface-2: #232730;
+        --border: #2d323c;
+        --text: #e6e8ed;
+        --text-dim: #9aa0ac;
+        --accent: #7fd4ff;
+        --ok: #6ee7b7;
+        --warn: #fbbf24;
+        --err: #fb7185;
+        --space-1: 4px; --space-2: 6px; --space-3: 8px; --space-4: 10px;
+        --space-5: 12px; --space-6: 16px; --space-7: 24px;
+        --radius-sm: 4px; --radius-md: 6px; --radius-lg: 8px;
+        --font-sans:
+          -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", "Noto Sans JP",
+          "Segoe UI", Roboto, sans-serif;
+        --font-mono: "Menlo", "Consolas", monospace;
+        --font-size-xs: 10px; --font-size-sm: 11px; --font-size-md: 12px;
+        --font-size-base: 13px; --font-size-lg: 14px; --font-size-xl: 18px;
+        color-scheme: dark;
+      }
+    }
+
+    /* === base (touch しない) === */
+    @layer base {
+      * { box-sizing: border-box; margin: 0; }
+      html, body {
+        background: #07080b; color: var(--text); font-family: var(--font-sans);
+        font-size: var(--font-size-lg); line-height: 1.6; min-height: 100%;
+      }
+      body { padding: 32px 16px 64px; }
+    }
+
+    /* === app (project の view 関数で使うクラスをここに追加) === */
+    @layer app {
+      /* 例: card */
+      .card {
+        background: var(--surface); border: 1px solid var(--border);
+        border-radius: var(--radius-lg); padding: var(--space-4) var(--space-5);
+        cursor: pointer;
+      }
+      .card:hover { background: var(--surface-2); border-color: var(--accent); }
+      .card-title { font-weight: 600; font-size: var(--font-size-base); }
+      .card-meta { color: var(--text-dim); font-size: var(--font-size-sm); margin-top: 2px; }
+
+      .back-btn {
+        background: none; border: none; color: var(--accent);
+        font-size: var(--font-size-lg); cursor: pointer;
+      }
+    }
+
+    /* === canvas (touch しない: フロー図/Matrix の generic 基盤) === */
+    @layer canvas {
+      .stage { max-width: 1500px; margin: 0 auto; }
+      .stage-head { text-align: center; margin-bottom: 32px; }
+      .stage-head h1 { font-size: 22px; margin-bottom: 6px; }
+      .stage-head p { color: var(--text-dim); font-size: 13px; }
+      .play-bar {
+        display: inline-flex; align-items: center; gap: 10px;
+        margin-top: 12px; padding: 6px 14px;
+        background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+        border-radius: 999px; font-size: 12px; color: var(--text-dim);
+      }
+      .play-bar .play-dot {
+        width: 8px; height: 8px; border-radius: 50%;
+        background: var(--ok); box-shadow: 0 0 8px var(--ok);
+        animation: pulse 1.6s ease-in-out infinite;
+      }
+      @keyframes pulse { 0%,100% {opacity:1;} 50% {opacity:0.4;} }
+      .play-bar button {
+        background: transparent; border: 1px solid var(--border);
+        color: var(--text-dim); padding: 2px 10px; border-radius: 999px;
+        font-size: 11px; cursor: pointer;
+      }
+      .viewport-controls {
+        display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;
+        margin-top: 16px; padding: 10px 16px;
+        background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+        border-radius: 10px; font-size: 12px;
+      }
+      .viewport-controls .label {
+        color: var(--text-dim); font-size: 10px; letter-spacing: 0.18em;
+        text-transform: uppercase; align-self: center;
+      }
+      .viewport-controls button {
+        background: var(--surface); border: 1px solid var(--border);
+        color: var(--text-dim); padding: 4px 12px; border-radius: 6px;
+        font-size: 11px; cursor: pointer;
+      }
+      .viewport-controls button.active {
+        background: color-mix(in srgb, var(--accent) 22%, transparent);
+        border-color: var(--accent); color: var(--accent);
+      }
+      .section-title {
+        font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+        color: var(--text-dim); margin: 48px 0 6px;
+        padding-bottom: 8px; border-bottom: 1px solid var(--border);
+      }
+      .canvas {
+        position: relative; display: flex; flex-wrap: wrap;
+        justify-content: center; gap: 80px 100px; padding: 40px 20px 60px;
+      }
+      .node {
+        position: relative; z-index: 2; flex: 0 0 auto;
+        width: var(--viewport-px);
+        background: #14161c; border: 1px solid var(--border);
+        border-radius: 12px; overflow: hidden;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+        display: flex; flex-direction: column;
+        transition: border-color 0.2s, box-shadow 0.2s;
+      }
+      .node.active {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 2px var(--accent), 0 12px 40px rgba(127,212,255,0.25);
+      }
+      .node-head {
+        display: flex; align-items: center; gap: 8px;
+        padding: 10px 14px; background: rgba(255,255,255,0.025);
+        border-bottom: 1px solid var(--border);
+      }
+      .node-head .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--err); }
+      .node-head .dot:nth-child(2) { background: var(--warn); }
+      .node-head .dot:nth-child(3) { background: var(--ok); }
+      .node-head .name { font-size: 12px; font-weight: 600; }
+      .node-head .id {
+        margin-left: auto; font-family: var(--font-mono); font-size: 10px;
+        color: var(--text-dim); letter-spacing: 0.16em; text-transform: uppercase;
+      }
+      .node-body {
+        background: var(--bg); height: var(--viewport-h-px); max-height: 80vh;
+        overflow-y: auto; overflow-x: hidden;
+      }
+      .node-body .miniature { width: 100%; min-height: 100%; padding: 14px; }
+
+      .edges { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+      .edges path { fill: none; stroke: var(--text-dim); stroke-width: 1.5; opacity: 0.5; }
+      .edges path.primary { stroke: var(--accent); opacity: 0.9; }
+      .edges path.firing {
+        stroke: var(--accent); stroke-width: 2.5; opacity: 1;
+        animation: dash 0.6s ease-out;
+      }
+      @keyframes dash { from { stroke-dashoffset: 24; } to { stroke-dashoffset: 0; } }
+      .edges .arrowhead { fill: var(--text-dim); }
+      .edges .arrowhead.primary { fill: var(--accent); }
+      .edges text {
+        fill: var(--text); font-family: var(--font-mono); font-size: 11px;
+        paint-order: stroke; stroke: var(--bg); stroke-width: 4;
+      }
+      .edges text.primary { fill: var(--accent); }
+
+      .matrix { display: flex; flex-direction: column; gap: 32px; }
+      .matrix-row { display: flex; flex-wrap: wrap; gap: 16px; }
+      .frame {
+        flex: 0 0 auto; width: var(--viewport-px);
+        background: #14161c; border: 1px solid var(--border);
+        border-radius: 8px; overflow: hidden;
+      }
+      .frame-head {
+        padding: 8px 12px; background: rgba(255,255,255,0.025);
+        border-bottom: 1px solid var(--border);
+        font-family: var(--font-mono); font-size: 10px;
+        color: var(--text-dim);
+      }
+      .frame-body {
+        background: var(--bg); height: var(--viewport-h-px); max-height: 70vh;
+        overflow-y: auto; overflow-x: hidden;
+      }
+      .frame-body .miniature { width: 100%; min-height: 100%; padding: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <header class="stage-head">
+      <h1>{{PROJECT_NAME}} — Flow Overview</h1>
+      <p>{{PROJECT_DESCRIPTION}}</p>
+      <div class="play-bar">
+        <span class="play-dot"></span>
+        LIVE — 全 frame が操作可能
+        <button id="btn-reset-all" type="button">RESET ALL</button>
+      </div>
+      <div class="viewport-controls" id="viewport-controls">
+        <span class="label">viewport (CSS px, w × h)</span>
+        <button type="button" data-vw="320"  data-vh="568">320×568</button>
+        <button type="button" data-vw="375"  data-vh="667" class="active">375×667</button>
+        <button type="button" data-vw="393"  data-vh="852">393×852</button>
+        <button type="button" data-vw="768"  data-vh="1024">768×1024</button>
+        <button type="button" data-vw="1024" data-vh="768">1024×768</button>
+        <button type="button" data-vw="1280" data-vh="800">1280×800</button>
+      </div>
+    </header>
+
+    <h2 class="section-title">▸ User Flow</h2>
+    <div class="canvas" id="canvas">
+      <svg class="edges" id="edges" aria-hidden="true">
+        <defs>
+          <marker id="arrow-primary" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" class="arrowhead primary"/>
+          </marker>
+          <marker id="arrow-secondary" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" class="arrowhead"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+
+    <h2 class="section-title">▸ States Matrix</h2>
+    <div class="matrix" id="matrix"></div>
+  </div>
+
+  <script>
+    // ============================================================
+    // SAMPLE データ — プロジェクトのドメインに置換せよ
+    // ============================================================
+    const SAMPLE = [
+      { id: 'item-1', title: 'サンプル項目 1', meta: '詳細メタ' },
+      { id: 'item-2', title: 'サンプル項目 2', meta: '詳細メタ' },
+      { id: 'item-3', title: 'サンプル項目 3', meta: '詳細メタ' },
+    ]
+
+    // ============================================================
+    // view 関数 — プロジェクトの画面ごとに置換/追加せよ
+    // 各 view は state を引数に取り HTML 文字列を返す純粋関数
+    // ============================================================
+
+    /**
+     * GENERIC ジェネリック card-grid view (リファレンス例)
+     * プロジェクトに応じて置換: renderHomeView / renderListView / renderHudView 等
+     * variant 別の表示は state.variant を見て分岐
+     */
+    function genericCardView(state) {
+      const variant = state.variant ?? 'filled'
+      if (variant === 'empty') {
+        return `<p style="color:var(--text-dim);text-align:center;padding:48px 16px;">空の状態</p>`
+      }
+      const cards = SAMPLE.map((item) => `
+        <div class="card" data-action="select-item" data-value="${item.id}">
+          <div class="card-title">${item.title}</div>
+          <div class="card-meta">${item.meta}</div>
+        </div>
+      `).join('')
+      return `
+        <header style="margin-bottom: 16px;"><h1 style="font-size:18px;">{{SCREEN_NAME}}</h1></header>
+        <div style="display: flex; flex-direction: column; gap: 8px;">${cards}</div>
+      `
+    }
+
+    /**
+     * GENERIC detail view (back ボタン付き)
+     */
+    function genericDetailView(state) {
+      const item = SAMPLE.find((i) => i.id === state.selectedId) ?? SAMPLE[0]
+      return `
+        <header style="margin-bottom: 16px;">
+          <button class="back-btn" data-action="back">← 戻る</button>
+        </header>
+        <div class="card" style="cursor:default;">
+          <div class="card-title" style="font-size:16px;">${item.title}</div>
+          <div class="card-meta">${item.meta}</div>
+        </div>
+      `
+    }
+
+    /**
+     * ルータ — state.kind ごとに view を選ぶ
+     * 画面追加時はここに case を追加
+     */
+    function renderState(state) {
+      switch (state.kind) {
+        case 'detail': return genericDetailView(state)
+        default:       return genericCardView(state)
+      }
+    }
+
+    // ============================================================
+    // 状態 — プロジェクトの画面構成に合わせて置換
+    // ============================================================
+    function defaultListState(variant = 'filled') {
+      return { kind: 'list', variant }
+    }
+    function defaultDetailState(selectedId = 'item-1') {
+      return { kind: 'detail', selectedId }
+    }
+
+    // フロー図のノード
+    const flowFrames = [
+      { key: 'flow:list',   area: 'A', name: 'Screen A', initial: () => defaultListState() },
+      { key: 'flow:detail', area: 'B', name: 'Screen B', initial: () => defaultDetailState() },
+    ]
+
+    // States Matrix (各画面の variants)
+    const matrixScreens = [
+      { id: 'list', name: 'Screen A', frames: [
+        { key: 'matrix:list:filled', variantName: 'filled', state: () => defaultListState('filled') },
+        { key: 'matrix:list:empty',  variantName: 'empty',  state: () => defaultListState('empty') },
+      ]},
+      { id: 'detail', name: 'Screen B', frames: [
+        { key: 'matrix:detail:default', variantName: 'default', state: () => defaultDetailState() },
+      ]},
+    ]
+
+    // 画面間遷移
+    const flowEdges = [
+      { from: 'flow:list', to: 'flow:detail', label: 'select', kind: 'primary',
+        side: { from: 'right', to: 'left' }, offset: -16 },
+      { from: 'flow:detail', to: 'flow:list', label: '← back', kind: 'primary',
+        side: { from: 'left', to: 'right' }, offset: 16 },
+    ]
+
+    // ============================================================
+    // generic 基盤 — touch しない (state machine + 描画 + path)
+    // ============================================================
+    const frameStates = new Map()
+    function initFrameStates() {
+      frameStates.clear()
+      for (const f of flowFrames) frameStates.set(f.key, { ...f.initial(), frameKey: f.key })
+      for (const s of matrixScreens) for (const f of s.frames) frameStates.set(f.key, { ...f.state(), frameKey: f.key })
+    }
+    initFrameStates()
+    let flowActive = flowFrames[0].key
+    let flowSelectedId = SAMPLE[0]?.id ?? null
+
+    const canvas = document.getElementById('canvas')
+    const edgesSvg = document.getElementById('edges')
+
+    function syncFlowSelection() {
+      const detail = frameStates.get('flow:detail')
+      if (detail && 'selectedId' in detail) detail.selectedId = flowSelectedId
+    }
+
+    function renderNode(frame) {
+      const state = frameStates.get(frame.key)
+      const isActive = flowActive === frame.key
+      return `
+        <article class="node${isActive ? ' active' : ''}" data-frame-key="${frame.key}">
+          <div class="node-head">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="name">${frame.name}</span>
+            <span class="id">${frame.key.split(':').pop()}</span>
+          </div>
+          <div class="node-body"><div class="miniature">${renderState(state)}</div></div>
+        </article>`
+    }
+
+    function buildCanvas() {
+      syncFlowSelection()
+      for (const n of canvas.querySelectorAll('.node')) n.remove()
+      for (const f of flowFrames) canvas.insertAdjacentHTML('beforeend', renderNode(f))
+    }
+
+    function renderFrame(frame) {
+      const state = frameStates.get(frame.key)
+      return `
+        <article class="frame" data-frame-key="${frame.key}">
+          <div class="frame-head">${frame.variantName}</div>
+          <div class="frame-body"><div class="miniature">${renderState(state)}</div></div>
+        </article>`
+    }
+
+    function buildMatrix() {
+      const root = document.getElementById('matrix')
+      root.innerHTML = ''
+      for (const screen of matrixScreens) {
+        const wrap = document.createElement('section')
+        wrap.innerHTML = `
+          <header style="margin-bottom:12px;display:flex;gap:12px;align-items:baseline;">
+            <h3 style="font-size:14px;">${screen.name}</h3>
+            <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);">${screen.frames.length} variants</span>
+          </header>
+          <div class="matrix-row">${screen.frames.map(renderFrame).join('')}</div>`
+        root.appendChild(wrap)
+      }
+    }
+
+    // edges (SVG bezier)
+    function anchor(rect, side, parent) {
+      const x = rect.left - parent.left, y = rect.top - parent.top
+      switch (side) {
+        case 'top':    return { x: x + rect.width/2, y }
+        case 'bottom': return { x: x + rect.width/2, y: y + rect.height }
+        case 'left':   return { x, y: y + rect.height/2 }
+        case 'right':  return { x: x + rect.width, y: y + rect.height/2 }
+      }
+    }
+    function curve(p1, p2) {
+      const dx = p2.x-p1.x, dy = p2.y-p1.y
+      const handle = Math.max(40, Math.min(140, Math.abs(dx)*0.45 + Math.abs(dy)*0.45))
+      const isHoriz = Math.abs(dx) > Math.abs(dy)
+      const c1 = isHoriz ? {x:p1.x+Math.sign(dx)*handle,y:p1.y} : {x:p1.x,y:p1.y+Math.sign(dy)*handle}
+      const c2 = isHoriz ? {x:p2.x-Math.sign(dx)*handle,y:p2.y} : {x:p2.x,y:p2.y-Math.sign(dy)*handle}
+      return `M ${p1.x} ${p1.y} C ${c1.x} ${c1.y}, ${c2.x} ${c2.y}, ${p2.x} ${p2.y}`
+    }
+
+    function drawEdges(firingIdx = -1) {
+      for (const el of edgesSvg.querySelectorAll('g.edge')) el.remove()
+      const parent = canvas.getBoundingClientRect()
+      edgesSvg.setAttribute('width', parent.width)
+      edgesSvg.setAttribute('height', parent.height)
+      edgesSvg.setAttribute('viewBox', `0 0 ${parent.width} ${parent.height}`)
+      const nodeMap = new Map()
+      for (const n of canvas.querySelectorAll('.node')) nodeMap.set(n.dataset.frameKey, n.getBoundingClientRect())
+      flowEdges.forEach((e, idx) => {
+        const fr = nodeMap.get(e.from), tr = nodeMap.get(e.to)
+        if (!fr || !tr) return
+        const p1 = anchor(fr, e.side.from, parent), p2 = anchor(tr, e.side.to, parent)
+        if (e.offset) {
+          if (e.side.from === 'left' || e.side.from === 'right') { p1.y += e.offset; p2.y += e.offset }
+          else { p1.x += e.offset; p2.x += e.offset }
+        }
+        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g'); g.classList.add('edge')
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+        path.setAttribute('d', curve(p1, p2))
+        if (e.kind === 'primary') path.classList.add('primary')
+        if (idx === firingIdx) path.classList.add('firing')
+        path.setAttribute('marker-end', `url(#arrow-${e.kind || 'secondary'})`)
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text')
+        text.setAttribute('x', (p1.x+p2.x)/2); text.setAttribute('y', (p1.y+p2.y)/2 - 6)
+        text.setAttribute('text-anchor', 'middle')
+        if (e.kind === 'primary') text.classList.add('primary')
+        text.textContent = e.label
+        g.appendChild(path); g.appendChild(text); edgesSvg.appendChild(g)
+      })
+    }
+
+    // event delegation
+    function findFrameKey(target) { return target.closest('[data-frame-key]')?.dataset?.frameKey ?? null }
+    function fireEdge(from, to) {
+      const idx = flowEdges.findIndex((e) => e.from === from && e.to === to)
+      drawEdges(idx); setTimeout(() => drawEdges(), 600)
+    }
+    function rerender() { buildCanvas(); buildMatrix(); drawEdges() }
+
+    // ============================================================
+    // handleAction — プロジェクトの action ごとに case 追加
+    // ============================================================
+    function handleAction(action, target, frameKey) {
+      const state = frameStates.get(frameKey)
+      if (!state) return
+      const inFlow = frameKey.startsWith('flow:')
+
+      switch (action) {
+        case 'select-item':
+          if (inFlow) {
+            flowSelectedId = target.dataset.value
+            flowActive = 'flow:detail'
+            fireEdge('flow:list', 'flow:detail')
+          }
+          break
+        case 'back':
+          if (inFlow && state.kind === 'detail') {
+            flowActive = 'flow:list'
+            fireEdge('flow:detail', 'flow:list')
+          }
+          break
+        // TODO: project の action をここに追加
+      }
+      rerender()
+    }
+
+    document.addEventListener('click', (e) => {
+      const target = e.target.closest('[data-action]')
+      if (!target || target.tagName === 'SELECT' || target.tagName === 'INPUT' || target.disabled) return
+      handleAction(target.dataset.action, target, findFrameKey(target))
+    })
+    document.addEventListener('change', (e) => {
+      const target = e.target.closest('[data-action]')
+      if (!target) return
+      handleAction(target.dataset.action, target, findFrameKey(target))
+    })
+
+    document.getElementById('btn-reset-all').addEventListener('click', () => {
+      initFrameStates(); flowActive = flowFrames[0].key
+      flowSelectedId = SAMPLE[0]?.id ?? null; rerender()
+    })
+
+    document.getElementById('viewport-controls').addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-vw]')
+      if (!btn) return
+      document.documentElement.style.setProperty('--viewport-px',   `${btn.dataset.vw}px`)
+      document.documentElement.style.setProperty('--viewport-h-px', `${btn.dataset.vh}px`)
+      for (const b of e.currentTarget.querySelectorAll('button[data-vw]')) b.classList.toggle('active', b === btn)
+      requestAnimationFrame(() => drawEdges()); setTimeout(() => drawEdges(), 50)
+    })
+
+    // boot
+    rerender()
+    new ResizeObserver(() => drawEdges()).observe(canvas)
+    window.addEventListener('resize', () => drawEdges())
+  </script>
+</body>
+</html>

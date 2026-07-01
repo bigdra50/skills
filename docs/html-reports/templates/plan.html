@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>[Template] 実装計画</title>
+
+<meta name="report:type" content="plan">
+<meta name="report:date" content="2026-05-20">
+<meta name="report:tags" content="template,plan">
+
+<link rel="stylesheet" href="../_assets/theme.css">
+<link rel="stylesheet" href="../_assets/components.css">
+<style>
+  .task-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .task-item {
+    display: grid;
+    grid-template-columns: 24px 1fr auto;
+    gap: var(--sp-3);
+    padding: var(--sp-2) var(--sp-3);
+    border-bottom: 1px solid var(--border-soft);
+    align-items: center;
+  }
+  .task-item:last-child { border-bottom: none; }
+  .task-check {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+  }
+  .task-item.done .task-check {
+    background: var(--good);
+    border-color: var(--good);
+    color: white;
+  }
+  .task-item.done .task-check::after { content: "✓"; }
+  .task-item.in-progress .task-check {
+    border-color: var(--accent);
+    background: rgba(88, 166, 255, 0.2);
+  }
+  .task-item.done .task-label { color: var(--text-mute); text-decoration: line-through; }
+  .task-effort {
+    color: var(--text-mute);
+    font-family: var(--font-mono);
+    font-size: var(--fz-xs);
+  }
+  .phase-card {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: var(--sp-4) var(--sp-5);
+    margin-bottom: var(--sp-4);
+  }
+  .phase-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    margin-bottom: var(--sp-3);
+  }
+  .phase-title { font-weight: 600; font-size: var(--fz-md); }
+  .phase-progress { display: flex; align-items: center; gap: var(--sp-2); flex: 1; max-width: 240px; }
+  .phase-progress .progress { flex: 1; }
+  .phase-progress .pct { color: var(--text-dim); font-size: var(--fz-sm); font-family: var(--font-mono); min-width: 36px; text-align: right; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header class="report-header">
+  <h1>実装計画テンプレート</h1>
+  <div class="meta">
+    <span>Type: Plan</span>
+    <span>Date: YYYY-MM-DD</span>
+    <span>Owner: 担当者</span>
+    <span>Scope: 機能/Issue番号</span>
+  </div>
+</header>
+
+<nav class="no-print">
+  <a href="../index.html">← Index</a>
+</nav>
+
+<!-- ============================================================
+     1. ゴール / 完了定義
+     ============================================================ -->
+<h2>ゴール</h2>
+<div class="summary">
+  <p>このプランで達成すること、完了条件 (Definition of Done) を明示する。</p>
+  <p><strong>完了条件:</strong></p>
+  <ul>
+    <li>全 EditMode テストが通過</li>
+    <li>CodeHealth ≥ 8.0 を維持</li>
+    <li>ADR-XXXX を更新</li>
+  </ul>
+</div>
+
+<!-- ============================================================
+     2. 全体進捗
+     ============================================================ -->
+<h2>全体進捗</h2>
+<div class="metrics">
+  <div class="metric">
+    <div class="metric-label">完了タスク</div>
+    <div class="metric-value">3 / 12</div>
+    <div class="metric-delta">25%</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">予定期間</div>
+    <div class="metric-value">3 days</div>
+    <div class="metric-delta">残: 2 days</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">ブロッカー</div>
+    <div class="metric-value">1</div>
+    <div class="metric-delta down">要対応</div>
+  </div>
+</div>
+
+<div class="progress" style="margin-bottom: var(--sp-6);">
+  <div class="progress-bar" style="width: 25%;"></div>
+</div>
+
+<!-- ============================================================
+     3. フェーズ別タスク
+     ============================================================ -->
+<h2>フェーズ別タスク</h2>
+
+<div class="phase-card">
+  <div class="phase-header">
+    <div class="phase-title">Phase 1: 設計 (1 day)</div>
+    <div class="phase-progress">
+      <div class="progress"><div class="progress-bar good" style="width: 100%;"></div></div>
+      <span class="pct">100%</span>
+    </div>
+  </div>
+  <ul class="task-list">
+    <li class="task-item done">
+      <span class="task-check"></span>
+      <span class="task-label">既存実装の調査・依存関係マップ作成</span>
+      <span class="task-effort">2h</span>
+    </li>
+    <li class="task-item done">
+      <span class="task-check"></span>
+      <span class="task-label">API設計レビュー (Copilot)</span>
+      <span class="task-effort">1h</span>
+    </li>
+  </ul>
+</div>
+
+<div class="phase-card">
+  <div class="phase-header">
+    <div class="phase-title">Phase 2: 実装 (1 day)</div>
+    <div class="phase-progress">
+      <div class="progress"><div class="progress-bar" style="width: 50%;"></div></div>
+      <span class="pct">50%</span>
+    </div>
+  </div>
+  <ul class="task-list">
+    <li class="task-item done">
+      <span class="task-check"></span>
+      <span class="task-label">IScenarioTitleProvider インタフェース定義</span>
+      <span class="task-effort">30m</span>
+    </li>
+    <li class="task-item in-progress">
+      <span class="task-check"></span>
+      <span class="task-label">ScreenFlow 4箇所の呼び出し置換</span>
+      <span class="task-effort">2h</span>
+    </li>
+    <li class="task-item">
+      <span class="task-check"></span>
+      <span class="task-label">既存 ScenarioMetadataExtensions の削除</span>
+      <span class="task-effort">30m</span>
+    </li>
+  </ul>
+</div>
+
+<div class="phase-card">
+  <div class="phase-header">
+    <div class="phase-title">Phase 3: 検証 (1 day)</div>
+    <div class="phase-progress">
+      <div class="progress"><div class="progress-bar warn" style="width: 0%;"></div></div>
+      <span class="pct">0%</span>
+    </div>
+  </div>
+  <ul class="task-list">
+    <li class="task-item">
+      <span class="task-check"></span>
+      <span class="task-label">EditMode テスト追加 (locale fallback 含む)</span>
+      <span class="task-effort">2h</span>
+    </li>
+    <li class="task-item">
+      <span class="task-check"></span>
+      <span class="task-label">PlayMode 動作確認 (4画面)</span>
+      <span class="task-effort">1h</span>
+    </li>
+    <li class="task-item">
+      <span class="task-check"></span>
+      <span class="task-label">jb inspectcode で警告ゼロ確認</span>
+      <span class="task-effort">30m</span>
+    </li>
+  </ul>
+</div>
+
+<!-- ============================================================
+     4. Gantt (Mermaid)
+     ============================================================ -->
+<h2>スケジュール (Gantt)</h2>
+<figure class="mermaid-wrap">
+  <div class="mermaid">
+gantt
+  dateFormat YYYY-MM-DD
+  title 実装スケジュール
+  section Phase 1: 設計
+  既存実装調査       :done, p1a, 2026-05-20, 1d
+  API設計レビュー    :done, p1b, after p1a, 4h
+  section Phase 2: 実装
+  Provider定義      :done, p2a, 2026-05-21, 4h
+  ScreenFlow置換    :active, p2b, after p2a, 1d
+  旧コード削除       :p2c, after p2b, 4h
+  section Phase 3: 検証
+  テスト追加         :p3a, 2026-05-22, 1d
+  PlayMode検証      :p3b, after p3a, 4h
+  </div>
+  <figcaption class="figcap">フェーズ別スケジュール (Mermaid Gantt)</figcaption>
+</figure>
+
+<!-- ============================================================
+     5. 依存関係グラフ
+     ============================================================ -->
+<h2>依存関係グラフ</h2>
+<figure class="mermaid-wrap">
+  <div class="mermaid">
+flowchart LR
+  A[IScenarioTitleProvider 定義] --> B[MenuScreenFlow 置換]
+  A --> C[ConfirmScreenFlow 置換]
+  A --> D[TrainingScreenFlow 置換]
+  A --> E[OverviewScreenFlow 置換]
+  B --> F[旧Extensions 削除]
+  C --> F
+  D --> F
+  E --> F
+  F --> G[EditMode テスト追加]
+  G --> H[PlayMode 検証]
+  classDef done fill:#3fb95022,stroke:#3fb950
+  classDef active fill:#58a6ff22,stroke:#58a6ff
+  class A done
+  class B,C active
+  </div>
+  <figcaption class="figcap">タスク依存関係 (緑=完了 / 青=進行中)</figcaption>
+</figure>
+
+<!-- ============================================================
+     6. リスク / トレードオフ
+     ============================================================ -->
+<h2>リスクとトレードオフ</h2>
+<table class="report-table">
+  <thead>
+    <tr>
+      <th>項目</th>
+      <th>影響</th>
+      <th>確率</th>
+      <th>対策</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>locale 変更タイミングが既存と異なる</td>
+      <td><span class="badge badge-warn">Med</span></td>
+      <td>Low</td>
+      <td>R3 で locale を購読し reactive 化する</td>
+    </tr>
+    <tr>
+      <td>テスト追加で CodeHealth 低下</td>
+      <td><span class="badge badge-info">Low</span></td>
+      <td>Med</td>
+      <td>fixture を Domain に寄せて Application 層を薄く保つ</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ============================================================
+     7. 関連リンク
+     ============================================================ -->
+<h2>関連リンク</h2>
+<ul>
+  <li><a href="../reviews/2026-05-20-shallow-class.html">参照レビュー: 浅いクラス観点</a></li>
+  <li>Issue: <code>#XXX</code></li>
+  <li>ADR: <code>docs/adr/0007-...</code></li>
+</ul>
+
+<footer class="report-footer">
+  Template — このプランを次に書くときはここをコピーして埋めてください
+</footer>
+
+</div>
+<script src="../_assets/reports.js"></script>
+</body>
+</html>

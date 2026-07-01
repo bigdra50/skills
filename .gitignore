@@ -1,0 +1,17 @@
+# APM dependencies
+apm_modules/
+.apm/
+
+# Node / JS
+node_modules/
+
+# Editor / OS
+.DS_Store
+.vscode/
+.claude/settings.local.json
+
+# Eval runtime artifacts
+results/
+.waxa-cache/
+.tmp-*/
+_tmp_*/

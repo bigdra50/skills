@@ -1,0 +1,20 @@
+{
+    "name": "{Project}.{Feature}.PlayMode.Tests",
+    "rootNamespace": "{Project}.{Feature}.PlayMode.Tests",
+    "references": [
+        "{Project}.{Feature}",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

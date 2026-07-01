@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>[Template] コードレビュー</title>
+
+<!-- Report metadata (parsed by tools, optional) -->
+<meta name="report:type" content="review">
+<meta name="report:date" content="2026-05-20">
+<meta name="report:tags" content="template,review">
+
+<link rel="stylesheet" href="../_assets/theme.css">
+<link rel="stylesheet" href="../_assets/components.css">
+</head>
+<body>
+<div class="container">
+
+<header class="report-header">
+  <h1>コードレビューテンプレート</h1>
+  <div class="meta">
+    <span>Type: Review</span>
+    <span>Date: YYYY-MM-DD</span>
+    <span>Reviewer: 名前</span>
+    <span>Scope: Assets/App/Scripts/</span>
+  </div>
+</header>
+
+<nav class="no-print">
+  <a href="../index.html">← Index</a>
+</nav>
+
+<!-- ============================================================
+     1. レビュー観点 (Context)
+     ============================================================ -->
+<h2>レビュー観点</h2>
+<div class="summary">
+  <p>このレビューの目的・基準・対象を明示する。誰が何のために読むのか、どんな基準で判定したのかを書く。</p>
+</div>
+
+<!-- ============================================================
+     2. 要約 (Executive Summary)
+     ============================================================ -->
+<h2>要約</h2>
+<div class="summary">
+  <p>3行以内で全体傾向と最重要発見事項を述べる。読者は最悪ここしか読まない前提。</p>
+</div>
+
+<!-- ============================================================
+     3. KPI ダッシュボード
+     ============================================================ -->
+<h2>サマリメトリクス</h2>
+<div class="metrics">
+  <div class="metric">
+    <div class="metric-label">指摘件数</div>
+    <div class="metric-value">5</div>
+    <div class="metric-delta">うち優先度High: 2</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">対象ファイル</div>
+    <div class="metric-value">42</div>
+    <div class="metric-delta">変更行: +0 / -0</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">推奨アクション</div>
+    <div class="metric-value">3</div>
+    <div class="metric-delta up">即着手 1 / 議論 1 / 保留 1</div>
+  </div>
+</div>
+
+<!-- ============================================================
+     4. 指摘事項 (Findings)
+     ============================================================ -->
+<h2>指摘事項</h2>
+
+<div class="card priority-1">
+  <div class="card-header">
+    <div class="card-title">#1 <code>path/to/File.cs:42</code></div>
+    <span class="badge badge-bad">High</span>
+  </div>
+  <div class="signals">
+    <span class="signal">情報漏洩</span>
+    <span class="signal">薄いラッパー</span>
+  </div>
+  <dl>
+    <dt>判定理由</dt><dd>具体的に何が問題かを書く。コード/ファイル/行への参照を <code>file:line</code> 形式で示す。</dd>
+    <dt>推奨アクション</dt><dd>どう直すか。統合先・分割案・代替実装を具体的に。</dd>
+    <dt>改善点</dt><dd>修正後に何が良くなるか。認知負荷・修正箇所数・テスト容易性等。</dd>
+    <dt>影響範囲</dt><dd>呼び出し元数、テスト数、関連ADR 等。</dd>
+  </dl>
+
+  <!-- Before / After diff (inline) -->
+  <details class="collapsible">
+    <summary>Before / After を見る</summary>
+    <div class="body">
+      <div class="code-ref">
+        <div class="code-ref-header">
+          <span class="path">path/to/File.cs:38-50</span>
+          <span class="lang">Before</span>
+        </div>
+        <div class="diff">
+          <div class="diff-hunk">@@ -38,4 +38,3 @@</div>
+          <span class="diff-line diff-ctx">public class ScenarioConfirmPresenter</span>
+          <span class="diff-line diff-del">    private readonly Subject&lt;Unit&gt; _confirm = new();</span>
+          <span class="diff-line diff-del">    public void Confirm() =&gt; _confirm.OnNext(default);</span>
+          <span class="diff-line diff-ctx">}</span>
+        </div>
+      </div>
+
+      <div class="code-ref">
+        <div class="code-ref-header">
+          <span class="path">path/to/File.cs (After)</span>
+          <span class="lang">After</span>
+        </div>
+        <div class="diff">
+          <div class="diff-hunk">@@ -38,3 +38,5 @@</div>
+          <span class="diff-line diff-ctx">public class ScenarioConfirmPresenter</span>
+          <span class="diff-line diff-add">    public IObservable&lt;ConfirmResult&gt; AwaitDecision(CancellationToken ct)</span>
+          <span class="diff-line diff-add">        =&gt; _input.Bumper.Select(_ =&gt; ConfirmResult.Confirm)</span>
+          <span class="diff-line diff-add">             .Merge(_input.Menu.Select(_ =&gt; ConfirmResult.Cancel));</span>
+          <span class="diff-line diff-ctx">}</span>
+        </div>
+      </div>
+    </div>
+  </details>
+</div>
+
+<div class="card priority-3">
+  <div class="card-header">
+    <div class="card-title">#2 <code>another/File.cs:10</code></div>
+    <span class="badge badge-warn">Med</span>
+  </div>
+  <div class="signals">
+    <span class="signal">呼び出し連鎖</span>
+  </div>
+  <dl>
+    <dt>判定理由</dt><dd>...</dd>
+    <dt>推奨アクション</dt><dd>...</dd>
+  </dl>
+</div>
+
+<!-- ============================================================
+     5. 良い例 (Reference for what NOT to refactor)
+     ============================================================ -->
+<h2>深いクラスとして機能している良例</h2>
+<table class="report-table">
+  <thead>
+    <tr>
+      <th>クラス</th>
+      <th>外向きIF</th>
+      <th>内部で引き受けている複雑さ</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>path/to/GoodClass.cs:10</code></td>
+      <td><code>DoIt</code> 1メソッド</td>
+      <td>例: 状態管理、エラー集約、キャッシュ</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ============================================================
+     6. 関連図 (Mermaid)
+     ============================================================ -->
+<h2>関連図</h2>
+<figure class="mermaid-wrap">
+  <div class="mermaid">
+flowchart LR
+  A[Caller] --> B[Wrapper]
+  B --> C[Provider]
+  B -.-> D[Locale]
+  classDef shallow fill:#f8514922,stroke:#f85149,color:#fff
+  class B shallow
+  </div>
+  <figcaption class="figcap">薄いラッパー (赤): Caller から見ると Provider への単純な中継</figcaption>
+</figure>
+
+<!-- ============================================================
+     7. 判断サマリ (Verdict)
+     ============================================================ -->
+<h2>判断サマリ</h2>
+<div class="verdict">
+  <div class="verdict-item go">
+    <h4>即着手</h4>
+    <p>#1 ScenarioMetadataExtensions。副作用が小さく ROI 最大。</p>
+  </div>
+  <div class="verdict-item discuss">
+    <h4>議論必要</h4>
+    <p>#2 AppStateMachine。意図的な薄さか確認してから判断。</p>
+  </div>
+  <div class="verdict-item wait">
+    <h4>保留</h4>
+    <p>#3 Persistent wrapper。既存LCOM判断と衝突。</p>
+  </div>
+</div>
+
+<!-- ============================================================
+     8. 留意事項
+     ============================================================ -->
+<h2>留意事項</h2>
+<div class="note">
+  <strong>主観混入</strong>: 評価基準に主観が混じる箇所は明示。
+</div>
+<div class="note note-warn">
+  <strong>既存判断との対立</strong>: ADR-XXXX や CLAUDE.md と衝突する提案がある場合は明示。
+</div>
+
+<footer class="report-footer">
+  Template based on <a href="../reviews/2026-05-20-shallow-class.html">2026-05-20 浅いクラスレビュー</a>
+</footer>
+
+</div>
+<script src="../_assets/reports.js"></script>
+</body>
+</html>

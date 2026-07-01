@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>[Template] 品質監査</title>
+
+<meta name="report:type" content="audit">
+<meta name="report:date" content="2026-05-20">
+<meta name="report:tags" content="template,audit">
+
+<link rel="stylesheet" href="../_assets/theme.css">
+<link rel="stylesheet" href="../_assets/components.css">
+<style>
+  /* Audit-specific layout */
+  .chart-wrap {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: var(--sp-4) var(--sp-5);
+    margin: var(--sp-4) 0;
+  }
+  .chart-wrap canvas { max-width: 100%; }
+  .grid-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: var(--sp-4);
+  }
+  /* Priority quadrant (2x2 matrix) */
+  .quadrant {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    aspect-ratio: 1.5;
+    position: relative;
+    margin: var(--sp-4) 0;
+  }
+  .quadrant > div {
+    background: var(--bg-elev);
+    padding: var(--sp-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-1);
+  }
+  .quadrant h4 {
+    margin: 0 0 var(--sp-2);
+    font-size: var(--fz-sm);
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .q-tl { border-bottom-right-radius: 0; }
+  .quadrant .item {
+    background: var(--bg-card);
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    font-size: var(--fz-sm);
+    font-family: var(--font-mono);
+  }
+</style>
+</head>
+<body>
+<div class="container container-wide">
+
+<header class="report-header">
+  <h1>品質監査テンプレート</h1>
+  <div class="meta">
+    <span>Type: Audit</span>
+    <span>Date: YYYY-MM-DD</span>
+    <span>Tool: unilyze + ReSharper + Copilot</span>
+    <span>Scope: Assets/App/Scripts/**</span>
+  </div>
+</header>
+
+<nav class="no-print">
+  <a href="../index.html">← Index</a>
+</nav>
+
+<!-- ============================================================
+     1. 要約
+     ============================================================ -->
+<h2>要約</h2>
+<div class="summary">
+  <p>CodeHealth 平均は <strong>8.4</strong> で基準 (8.0) を満たす。一方で 3 型が閾値超過。</p>
+  <p>最重要は <code>JsonScenarioLoader</code> (7.8)、<code>AppBootstrap</code> (7.9)、<code>TrainingSession</code> (7.95)。</p>
+</div>
+
+<!-- ============================================================
+     2. KPI
+     ============================================================ -->
+<h2>KPI</h2>
+<div class="metrics">
+  <div class="metric">
+    <div class="metric-label">平均 CodeHealth</div>
+    <div class="metric-value">8.4</div>
+    <div class="metric-delta up">+0.2 vs 前回</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">閾値超過型</div>
+    <div class="metric-value">3</div>
+    <div class="metric-delta down">+1 vs 前回</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">複雑度 Max</div>
+    <div class="metric-value">14</div>
+    <div class="metric-delta">target: ≤ 10</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">重複検出</div>
+    <div class="metric-value">7</div>
+    <div class="metric-delta">類似度 ≥ 0.85</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">警告 (ReSharper)</div>
+    <div class="metric-value">0</div>
+    <div class="metric-delta up">クリア</div>
+  </div>
+</div>
+
+<!-- ============================================================
+     3. 推移グラフ (Chart.js)
+     ============================================================ -->
+<h2>推移</h2>
+<div class="grid-2">
+  <div class="chart-wrap">
+    <h4 style="margin-top: 0;">CodeHealth 推移 (週次)</h4>
+    <canvas id="chart-health" height="180"></canvas>
+  </div>
+  <div class="chart-wrap">
+    <h4 style="margin-top: 0;">アセンブリ別スコア</h4>
+    <canvas id="chart-radar" height="180"></canvas>
+  </div>
+</div>
+
+<!-- ============================================================
+     4. Heatmap (型 × メトリクス)
+     ============================================================ -->
+<h2>型 × メトリクス Heatmap</h2>
+<div class="chart-wrap">
+  <p style="margin: 0 0 var(--sp-3); color: var(--text-dim); font-size: var(--fz-sm);">
+    CodeHealth (緑) → 複雑度 (黄〜赤) の度合いを色で表現。
+  </p>
+  <div class="heatmap" style="grid-template-columns: 140px repeat(5, 80px);">
+    <div class="heatmap-cell" style="background: transparent; color: var(--text-dim); justify-content: flex-start;">クラス名</div>
+    <div class="heatmap-cell" style="background: transparent; color: var(--text-dim); font-size: 10px;">Health</div>
+    <div class="heatmap-cell" style="background: transparent; color: var(--text-dim); font-size: 10px;">Cyclomatic</div>
+    <div class="heatmap-cell" style="background: transparent; color: var(--text-dim); font-size: 10px;">LOC</div>
+    <div class="heatmap-cell" style="background: transparent; color: var(--text-dim); font-size: 10px;">DepIn</div>
+    <div class="heatmap-cell" style="background: transparent; color: var(--text-dim); font-size: 10px;">DepOut</div>
+
+    <div class="heatmap-cell" style="background: transparent; color: var(--text); justify-content: flex-start; font-size: 12px;">TrainingSession</div>
+    <div class="heatmap-cell h-2">7.95</div>
+    <div class="heatmap-cell h-3">14</div>
+    <div class="heatmap-cell h-2">220</div>
+    <div class="heatmap-cell h-1">5</div>
+    <div class="heatmap-cell h-2">8</div>
+
+    <div class="heatmap-cell" style="background: transparent; color: var(--text); justify-content: flex-start; font-size: 12px;">JsonScenarioLoader</div>
+    <div class="heatmap-cell h-2">7.80</div>
+    <div class="heatmap-cell h-2">11</div>
+    <div class="heatmap-cell h-3">280</div>
+    <div class="heatmap-cell h-0">2</div>
+    <div class="heatmap-cell h-1">4</div>
+
+    <div class="heatmap-cell" style="background: transparent; color: var(--text); justify-content: flex-start; font-size: 12px;">AppBootstrap</div>
+    <div class="heatmap-cell h-2">7.90</div>
+    <div class="heatmap-cell h-2">12</div>
+    <div class="heatmap-cell h-1">160</div>
+    <div class="heatmap-cell h-0">1</div>
+    <div class="heatmap-cell h-4">12</div>
+
+    <div class="heatmap-cell" style="background: transparent; color: var(--text); justify-content: flex-start; font-size: 12px;">ScenarioRepository</div>
+    <div class="heatmap-cell h-0">8.80</div>
+    <div class="heatmap-cell h-1">6</div>
+    <div class="heatmap-cell h-1">140</div>
+    <div class="heatmap-cell h-1">3</div>
+    <div class="heatmap-cell h-1">4</div>
+  </div>
+</div>
+
+<!-- ============================================================
+     5. 優先度マトリクス (2x2)
+     ============================================================ -->
+<h2>改善優先度マトリクス</h2>
+<p style="color: var(--text-dim); font-size: var(--fz-sm);">
+  影響度 (縦軸) × 修正容易性 (横軸)。左上 = 即着手領域。
+</p>
+<div class="quadrant">
+  <div class="q-tl">
+    <h4>影響大 × 容易</h4>
+    <span class="item">ScenarioMetadataExtensions</span>
+    <span class="item">StepHistoryStore</span>
+  </div>
+  <div>
+    <h4>影響大 × 困難</h4>
+    <span class="item">AppBootstrap (大規模分割)</span>
+  </div>
+  <div>
+    <h4>影響小 × 容易</h4>
+    <span class="item">Persistent* wrappers</span>
+  </div>
+  <div>
+    <h4>影響小 × 困難</h4>
+    <span class="item">JsonScenarioLoader 内部分解</span>
+  </div>
+</div>
+
+<!-- ============================================================
+     6. 詳細テーブル (ソート可能 - 簡易実装)
+     ============================================================ -->
+<h2>閾値超過型一覧</h2>
+<table class="report-table">
+  <thead>
+    <tr>
+      <th>型</th>
+      <th>CodeHealth</th>
+      <th>Cyclomatic Max</th>
+      <th>LOC</th>
+      <th>推奨アクション</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>JsonScenarioLoader</code></td>
+      <td><span class="dot dot-warn"></span>7.80</td>
+      <td>11</td>
+      <td>280</td>
+      <td>正規化処理を <code>NormalizationPipeline</code> に分離</td>
+    </tr>
+    <tr>
+      <td><code>AppBootstrap</code></td>
+      <td><span class="dot dot-warn"></span>7.90</td>
+      <td>12</td>
+      <td>160</td>
+      <td>画面遷移ルール抽出 (AppStateMachine 深化)</td>
+    </tr>
+    <tr>
+      <td><code>TrainingSession</code></td>
+      <td><span class="dot dot-warn"></span>7.95</td>
+      <td>14</td>
+      <td>220</td>
+      <td>Pause/Back 履歴を <code>StepBackHistory</code> へ</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ============================================================
+     7. 推奨アクション
+     ============================================================ -->
+<h2>推奨アクション</h2>
+<div class="verdict">
+  <div class="verdict-item go">
+    <h4>今週着手</h4>
+    <p>ScenarioMetadataExtensions → IScenarioTitleProvider 統合</p>
+  </div>
+  <div class="verdict-item discuss">
+    <h4>来週議論</h4>
+    <p>AppBootstrap の責務分解 (AppStateMachine 深化)</p>
+  </div>
+  <div class="verdict-item wait">
+    <h4>四半期内</h4>
+    <p>JsonScenarioLoader の Pipeline 分解</p>
+  </div>
+</div>
+
+<footer class="report-footer">
+  Data source: <code>.reports/unilyze.json</code> + <code>.reports/inspectcode*.sarif</code>
+</footer>
+
+</div>
+
+<script src="../_assets/reports.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  if (typeof Chart === "undefined") return;
+  Chart.defaults.color = "#8b949e";
+  Chart.defaults.borderColor = "#2d3742";
+  Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, sans-serif";
+
+  // CodeHealth 推移 (line chart)
+  const ctxHealth = document.getElementById("chart-health");
+  if (ctxHealth) {
+    new Chart(ctxHealth, {
+      type: "line",
+      data: {
+        labels: ["W1", "W2", "W3", "W4", "W5"],
+        datasets: [{
+          label: "平均 CodeHealth",
+          data: [8.0, 8.1, 8.05, 8.2, 8.4],
+          borderColor: "#58a6ff",
+          backgroundColor: "rgba(88,166,255,0.15)",
+          fill: true,
+          tension: 0.3,
+        }, {
+          label: "閾値",
+          data: [8, 8, 8, 8, 8],
+          borderColor: "#d29922",
+          borderDash: [4, 4],
+          pointRadius: 0,
+          fill: false,
+        }],
+      },
+      options: {
+        scales: { y: { beginAtZero: false, min: 7, max: 10 } },
+      },
+    });
+  }
+
+  // アセンブリ別 (radar)
+  const ctxRadar = document.getElementById("chart-radar");
+  if (ctxRadar) {
+    new Chart(ctxRadar, {
+      type: "radar",
+      data: {
+        labels: ["Domain", "Application", "Infrastructure", "Presentation", "Composition"],
+        datasets: [{
+          label: "CodeHealth",
+          data: [9.2, 8.4, 8.1, 8.5, 7.9],
+          backgroundColor: "rgba(63,185,80,0.2)",
+          borderColor: "#3fb950",
+          pointBackgroundColor: "#3fb950",
+        }],
+      },
+      options: {
+        scales: { r: { suggestedMin: 7, suggestedMax: 10, ticks: { stepSize: 1 } } },
+      },
+    });
+  }
+});
+</script>
+</body>
+</html>

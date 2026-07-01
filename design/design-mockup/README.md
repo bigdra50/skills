@@ -1,0 +1,228 @@
+# design-mockup — 詳細ガイド
+
+SKILL.md の補足。複雑な要件・詳細な設計判断が必要なときに参照する。
+
+## 1. データ構造
+
+`overview.html` の核心は以下の宣言的データ:
+
+```js
+const flow = {
+  screens: [
+    {
+      id: 'list',
+      name: 'List View',
+      badge: 'entry',           // optional
+      spotlight: true,          // optional: 起動時 active
+      variants: [
+        { id: 'filled',  name: 'filled',  state: () => defaultListState('filled') },
+        { id: 'empty',   name: 'empty',   state: () => defaultListState('empty') },
+        { id: 'loading', name: 'loading', state: () => defaultListState('loading') },
+        { id: 'error',   name: 'error',   state: () => defaultListState('error') },
+      ],
+    },
+    // ...
+  ],
+  edges: [
+    { from: 'list', to: 'detail', label: 'card', kind: 'primary',
+      side: { from: 'right', to: 'left' }, offset: -16 },
+    { from: 'detail', to: 'list', label: '← back', kind: 'primary',
+      side: { from: 'left', to: 'right' }, offset: 16 },
+    // ...
+  ],
+}
+```
+
+### screens
+
+| プロパティ | 必須 | 説明 |
+|---|---|---|
+| `id` | ✓ | ユニーク識別子 |
+| `name` | ✓ | UI に表示する名前 |
+| `badge` | | "entry" など付与すると node-head に表示 |
+| `spotlight` | | true で起動時 active 状態 |
+| `variants` | ✓ | 状態のバリエーション (filled/empty/error 等) |
+
+### edges
+
+| プロパティ | 必須 | 説明 |
+|---|---|---|
+| `from` / `to` | ✓ | screen id |
+| `label` | ✓ | 矢印中央に表示するトリガー名 |
+| `kind` | ✓ | `primary` (主動線・実線) / `secondary` (補助・点線) |
+| `side.from` / `side.to` | ✓ | アンカー辺: `top` / `bottom` / `left` / `right` |
+| `offset` | | 双方向エッジを並列表示するための平行移動量 (px) |
+
+## 2. viewport プリセット
+
+実機 CSS px (W×H) を使う。物理解像度ではない。
+
+| ボタン表記 | サイズ | デバイス |
+|---|---|---|
+| `320×568` | legacy | iPhone 5/SE 1st |
+| `375×667` | iPhone SE / 8 | デフォルト推奨 |
+| `393×852` | iPhone 14/15 | 現行 iPhone 標準 |
+| `430×932` | iPhone Pro Max | 大型 iPhone |
+| `768×1024` | iPad portrait | タブレット縦 |
+| `1024×768` | iPad landscape | タブレット横 |
+| `1280×800` | laptop | ラップトップ最小 |
+| `1920×1080` | FHD desktop | デスクトップ標準 |
+
+### CSS px と物理 px の違い
+
+```
+物理 px = CSS px × DPR (devicePixelRatio)
+```
+
+| デバイス | 物理 | CSS px (= viewport) | DPR |
+|---|---|---|---|
+| iPhone SE 3rd | 750×1334 | 375×667 | 2 |
+| iPhone 15 Pro | 1179×2556 | 393×852 | 3 |
+| iPad Pro 11 | 1668×2388 | 834×1194 | 2 |
+| MacBook Pro 14 | 3024×1964 | 1512×982 | 2 |
+| FHD モニター | 1920×1080 | 1920×1080 | 1 |
+
+メディアクエリ・auto-layout は CSS px を見る。viewport プリセットは CSS px で揃える。
+
+## 3. Figma との対応関係
+
+| Figma | このスキルでの実装 |
+|---|---|
+| Component Variants | `screen.variants[]` |
+| Component Properties | `state` オブジェクト (text/boolean/instance-swap 全て state で持つ) |
+| Interactive Components | `handleAction` 内の自動遷移 (例: `register → loading → filled`) |
+| Frames Matrix | `States Matrix` セクション |
+| Prototype connections | SVG path edges |
+| Spotlight on entry | `screen.spotlight: true` |
+| Smart Animate | `firing` クラス + `@keyframes dash` |
+| Frame size プリセット | viewport プリセットボタン |
+| Reset to default | RESET ALL ボタン |
+| Page (Pages 階層) | overview.html / comparison.html / index.html のファイル分割 |
+
+## 4. プロジェクトのトークン抽出
+
+新しいプロジェクトでこのスキルを使うときの最初の作業:
+
+```bash
+# 主要な CSS を探す
+fd 'styles\.css|index\.css|globals\.css' src/
+```
+
+該当 CSS の `:root { ... }` ブロックを Read で取得し、`templates/overview.html` の `@layer tokens` セクションに転記する。最低限必要なトークン:
+
+| トークン | 必須 | 例 |
+|---|---|---|
+| `--bg` | ✓ | 背景色 |
+| `--surface` | ✓ | カード背景 |
+| `--border` | ✓ | 罫線色 |
+| `--text` | ✓ | 文字色 |
+| `--text-dim` | ✓ | 補助文字色 |
+| `--accent` | ✓ | アクセント色 |
+| `--font-sans` | ✓ | 本文フォント |
+| `--font-mono` | | コード/モノスペース用 |
+| `--radius-*` | | 角丸 |
+| `--space-*` | | 間隔 |
+
+無い場合はデフォルト値を入れる (例: `--bg: #0f1115`)。
+
+## 5. 既存 view を読み取って render 関数を作る
+
+実装の view (例: `src/list-view.ts`) を Read し、HTML 生成部分を JS の純粋関数に書き直す:
+
+```ts
+// 元の TS 実装
+export function renderListView(): string {
+  return `<header>...</header>...`
+}
+```
+
+```js
+// モック内の generic 版
+function listView(state) {
+  const variant = state.variant ?? 'filled'
+  // state を見て HTML を組み立てる
+  return `<header>...</header>...`
+}
+```
+
+注意点:
+- 元の i18n 呼び出し (`t('xxx')`) は静的文字列に置き換え (mock なので)
+- イベントハンドラの代わりに `data-action="xxx"` 属性を埋め込む
+- 各 button / select に `data-action` を付ける (delegation 対象)
+- 入力欄には `data-action="input-url"` のように `data-action` を持たせる
+
+## 6. dropdown 即閉じ問題への対処
+
+`<select>` は click イベントで dropdown を開く。document level の click delegation がそのイベントを拾って rerender を起こすと、dropdown が即閉じる。回避:
+
+```js
+document.addEventListener('click', (e) => {
+  const target = e.target.closest('[data-action]')
+  if (!target) return
+  if (target.tagName === 'SELECT') return  // ← 必須
+  if (target.tagName === 'INPUT') return   // ← input も同様
+  handleAction(target.dataset.action, target, findFrameKey(target))
+})
+
+document.addEventListener('change', (e) => {
+  const target = e.target.closest('[data-action]')
+  if (!target) return
+  handleAction(target.dataset.action, target, findFrameKey(target))
+})
+```
+
+## 7. テキスト入力中の rerender 問題
+
+`<input>` の `input` イベントごとに rerender するとフォーカスが飛ぶ。state だけ更新して rerender はしない:
+
+```js
+document.addEventListener('input', (e) => {
+  const target = e.target.closest('[data-action="input-url"]')
+  if (!target) return
+  const state = frameStates.get(findFrameKey(target))
+  if (state) state.url = target.value
+  // rerender しない
+})
+```
+
+## 8. エッジの side / offset 設計のコツ
+
+- 同じ2画面間の双方向エッジは `side` を逆向きに、`offset` で並列に少しずらす
+- 例: list ↔ detail
+  - list → detail: `side: { from: 'right', to: 'left' }, offset: -16`
+  - detail → list: `side: { from: 'left', to: 'right' }, offset: 16`
+- 同方向の `side` で `offset` だけ符号反転 — エッジが平行に並ぶ
+
+## 9. examples/ の活用
+
+`examples/eveng2-reader-settings/` は完全動作する完成例。新しいプロジェクトに適用するときは:
+
+1. `examples/eveng2-reader-settings/overview.html` を Read で参考にする
+2. 構造を理解したら `templates/overview.html` をベースに自分のプロジェクト用を生成
+3. 不安があれば examples を Read し直して該当パターンを確認
+
+## 10. 出力ファイル名の規約
+
+```
+docs/design-mockups/
+├── index.html                       # ハブ (任意)
+├── <feature>-overview.html          # 必須 (メイン)
+└── <feature>-comparison.html        # 任意 (デザイン案比較が必要なら)
+```
+
+例:
+- `settings-overview.html`
+- `auth-flow-overview.html` + `auth-flow-comparison.html`
+- `checkout-overview.html`
+
+## 11. 既存ファイルの上書き判断
+
+同名ファイルが既にある場合:
+- ユーザーに「上書きするか / 別名で保存するか」を確認
+- バックアップ推奨: `cp foo.html foo.html.bak`
+
+## 12. デバッグ Tips
+
+- 矢印が表示されない → `drawEdges()` が呼ばれているか確認、ResizeObserver が node を観測しているか
+- viewport 切替で frame が動かない → `--viewport-px` が `:root` に設定されているか確認
+- イベントが発火しない → `data-action` が target 要素にあるか、`closest('[data-frame-key]')` で frame に到達できるか

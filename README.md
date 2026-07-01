@@ -89,14 +89,14 @@ Perspective sub-skills (dispatched in parallel by `review-weekly`): `unity/persp
 
 ### Review
 
-Language-agnostic code review skills. For Unity/C# projects, prefer the [Unity](#unity) review system above.
+Language-agnostic review skills. For code review, use the built-in `/code-review`; for Unity/C# projects, use the [Unity](#unity) review system above.
 
 | Skill | Install path | Description |
 |---|---|---|
-| [multi-review](review/multi-review/) | `review/multi-review` | Multi-tool 4-perspective code review (Claude/Codex/Copilot). |
-| [review-loop](review/review-loop/) | `review/review-loop` | Iterative code review loop with MUST/SHOULD/NICE convergence. |
 | [plan-loop](review/plan-loop/) | `review/plan-loop` | Iterative design plan review loop. |
 | [google-code-review](review/google-code-review/) | `review/google-code-review` | Google code review standards — 10 review dimensions. |
+
+Also available but not in the default install (redundant with built-in `/code-review`): `review/multi-review`, `review/review-loop`.
 
 ### Knowledge
 

@@ -1,0 +1,26 @@
+[tools]
+deno = "latest"
+
+[tasks."check:frontmatter"]
+description = "Validate YAML frontmatter in tracked SKILL.md files"
+run = "deno run --allow-read --allow-run=git scripts/validate-skill-frontmatter.ts"
+
+[tasks."test:frontmatter"]
+description = "Run tests for the SKILL.md frontmatter validator"
+run = "deno test --allow-read --allow-write --allow-run scripts/validate-skill-frontmatter_test.ts"
+
+[tasks."gen:readme"]
+description = "Generate / sync a boilerplate README.md next to each SKILL.md"
+run = "deno run --allow-read --allow-write --allow-run=git scripts/gen-skill-readme.ts"
+
+[tasks."check:readme"]
+description = "Verify each skill README is in sync with its SKILL.md"
+run = "deno run --allow-read --allow-run=git scripts/gen-skill-readme.ts --check"
+
+[tasks.test]
+description = "Run all checks"
+depends = ["test:frontmatter", "check:frontmatter", "check:readme"]
+
+[tasks.pre-commit]
+description = "Pre-commit gate"
+depends = ["check:frontmatter", "check:readme"]

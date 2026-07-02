@@ -36,18 +36,27 @@ From the arguments and the conversation so far, identify:
 - Why / who for — what the output enables (Fable performs better with intent)
 - Deliverable and done criteria — how anyone would judge the run complete
 - Run mode — attended (user watches, can answer) vs unattended (overnight, autonomous)
+- Environment access — hardware, devices, credentials, or external services the work
+  depends on, and whether the Fable session will actually have them
 - Constraints — scope limits, things not to touch, deadlines
 
 Infer as much as possible from the current repo and conversation before asking anything.
-If, after inferring, you still cannot fill two or more of {why, done criteria, run mode},
-ask once via AskUserQuestion (max 3 questions in one round). Otherwise proceed and state
-your assumptions explicitly in the final output — the user reviews the prompt before
-pasting it, so a visible assumption beats a blocking question.
+Ask once via AskUserQuestion (max 3 questions in one round) when, after inferring, you
+still cannot fill two or more of {why, done criteria, run mode} — or when a single gap
+is pivotal: it would flip the profile (attended vs unattended), or it suggests the
+premise is broken (the thing the task points at may not exist). Otherwise proceed and
+state your assumptions explicitly in the final output — the user reviews the prompt
+before pasting it, so a visible assumption beats a blocking question.
 
 ### Step 2 — Fable-worthiness gate
 
 Fable is for the top of the difficulty range. Testing it on simple workloads undersells
 it and wastes quota.
+
+Gate on evidence, not on the request text alone: run whatever cheap lookups from Step 3
+this judgment needs first. Rough requests get disqualified by what a look at the repo
+reveals (the feature already exists, it's a two-line change) and qualified by discovered
+complexity — expect to move between Step 2 and Step 3.
 
 Worth sending to Fable:
 
@@ -59,7 +68,7 @@ Worth sending to Fable:
 - Dense vision work: technical diagrams, detailed screenshots, web-app UI analysis
 
 Not worth Fable quota — say so and offer to handle it in this session or via a cheaper
-model instead (still generate the prompt if the user insists):
+model instead; generate the prompt anyway only if the user explicitly asks again:
 
 - 1–2 file mechanical edits, boilerplate, scaffolding, config wiring
 - Routine refactors or doc updates with no design judgment
@@ -91,7 +100,21 @@ session belongs in the prompt. Collect and bake in:
 
 Actually run the cheap lookups now (`ghq list | rg …`, check for test commands in
 package.json/mise.toml/Makefile, confirm file paths exist) rather than guessing paths
-that Fable will then waste time discovering are wrong.
+that Fable will then waste time discovering are wrong. Two checks that regularly
+reshape or kill a task:
+
+- Existence — confirm the thing the task points at actually exists (the UI to test, the
+  protocol client to audit), and that the requested capability doesn't already exist in
+  the repo.
+- Verification tooling — if checking the work needs tools (test runner, model checker,
+  emulator, device CLI), confirm they're installed; if not, put the exact fetch/install
+  commands in the prompt.
+
+If the target repo isn't cloned locally, verify it remotely (gh api, web search) and
+open the Environment section with the fetch step (`ghq get <url>`) — don't clone it
+yourself. When placing what you found: facts about the world (missing tools,
+closed-source dependencies, stale docs) go in Environment; rules the run must follow go
+in Constraints & boundaries.
 
 ### Step 4 — Classify and select
 
@@ -99,6 +122,10 @@ Pick the closest profile. The target is usually a Claude Code session, whose har
 already enforces act-when-ready, autonomy, lead-with-outcome, and faithful reporting at
 a baseline — blocks exist to emphasize what the task especially depends on. Select the
 few that matter; never all.
+
+Real tasks often straddle two profiles (an unattended run with open design questions,
+an audit that produces a new artifact). Pick the primary by where the risk lies, then
+borrow at most one or two blocks from the secondary. Five blocks is a practical ceiling.
 
 | Profile | Signals | Effort | Blocks |
 |---|---|---|---|
@@ -111,7 +138,8 @@ few that matter; never all.
 Effort recommendation:
 
 - `xhigh` — capability-sensitive work: one-shot correctness on a complex spec, deep
-  debugging, decisions that are expensive to revisit
+  debugging (closed-source dependencies, cross-subsystem interaction, hardware-only
+  repro), decisions that are expensive to revisit
 - `high` — default for anything that passed the worthiness gate
 - If `medium` or lower feels right, the task probably shouldn't go to Fable at all —
   revisit Step 2
@@ -150,7 +178,12 @@ Assembly rules:
 - For unattended runs, open the Task section with "Work end to end without pausing for
   approval" so the run doesn't stall on a checkpoint.
 - Never instruct Fable to echo, transcribe, or explain its internal reasoning in the
-  response — that triggers `reasoning_extraction` refusals.
+  response — that triggers `reasoning_extraction` refusals. Asking for a conclusion
+  plus its justification as part of the deliverable ("state which option you chose and
+  why, in 2–3 sentences") is fine.
+- For analysis deliverables, "don't fix" means existing files stay read-only; creating
+  new artifact files (a report, a formal spec) is the deliverable, not a fix. Spell
+  that split out in Constraints & boundaries.
 - Don't duplicate what the target repo's CLAUDE.md already enforces, when you know it.
 
 ## Block library
@@ -222,7 +255,9 @@ MEMORY — lesson notes, for recurring/multi-session work (designate a notes loc
 > chat history already records; update an existing note rather than creating a
 > duplicate; delete notes that turn out to be wrong.
 
-VERIFY — self-verification cadence, for long builds (fill in the interval):
+VERIFY — self-verification cadence, for long builds. Fill in [X] with a time interval
+("30 minutes") or a milestone list ("each phase: harness runs, first test green, CI
+integrated") — whichever fits the task's shape:
 
 > Establish a method for checking your own work at an interval of [X] as you build. Run
 > this every [X interval], verifying your work with subagents against the specification.
@@ -266,11 +301,15 @@ Deliver in this order, in the user's language:
 1. Judgment — 3–5 lines: profile, recommended effort with a one-line reason, blocks
    selected and why, and any assumptions you made in place of asking.
 2. Session setup — one line, e.g.: `新セッションで: model Fable 5 / /effort xhigh /
-   想定実行時間: 数十分〜` . Note that Fable turns run long; the user shouldn't
-   interrupt a working run.
+   想定実行時間: <estimate>` . Estimate the duration per task — don't copy an example's
+   numbers. Note that Fable turns run long; the user shouldn't interrupt a working run.
 3. The prompt — inside a four-backtick fence (the prompt often contains triple-backtick
    code blocks), ready to paste as-is.
 4. Offer once to copy it to the clipboard (`pbcopy` on macOS) or save it to a file.
+
+When the gate rejects the task, deliver instead: which gate criterion it hit and what
+you found (e.g. the feature already exists at `path:line`), plus the concrete
+alternative — offer to do it in this session now or hand it to a cheaper model.
 
 ## Anti-patterns
 

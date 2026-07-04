@@ -56,6 +56,7 @@ For code review, use the built-in `/code-review`; for Unity/C# projects, use the
 |---|---|---|
 | [claude-stats](workflow/claude-stats/) | `workflow/claude-stats` | Aggregate Claude Code usage statistics. |
 | [cc-worklog](workflow/cc-worklog/) | `workflow/cc-worklog` | Generate daily work reports from session logs. |
+| [compact-prep](workflow/compact-prep/) | `workflow/compact-prep` | Save session state to a temp file before /compact so recovery survives context compaction. |
 | [creating-pull-requests](workflow/creating-pull-requests/) | `workflow/creating-pull-requests` | PR creation with structured description and anti-patterns. |
 | [disk-usage](workflow/disk-usage/) | `workflow/disk-usage` | Disk usage investigation and tiered cleanup. |
 | [fable-prompt](workflow/fable-prompt/) | `workflow/fable-prompt` | Generate self-contained, guide-compliant prompts for separate Claude Fable 5 sessions. |

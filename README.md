@@ -59,7 +59,6 @@ For code review, use the built-in `/code-review`; for Unity/C# projects, use the
 | [compact-prep](workflow/compact-prep/) | `workflow/compact-prep` | Save session state to a temp file before /compact so recovery survives context compaction. |
 | [creating-pull-requests](workflow/creating-pull-requests/) | `workflow/creating-pull-requests` | PR creation with structured description and anti-patterns. |
 | [disk-usage](workflow/disk-usage/) | `workflow/disk-usage` | Disk usage investigation and tiered cleanup. |
-| [fable-prompt](workflow/fable-prompt/) | `workflow/fable-prompt` | Generate self-contained, guide-compliant prompts for separate Claude Fable 5 sessions. |
 | [orchestrator](workflow/orchestrator/) | `workflow/orchestrator` | Multi-step task decomposition with parallel sub-tasks. |
 | [pr-brief](workflow/pr-brief/) | `workflow/pr-brief` | Convert branch diff into a reviewer-friendly briefing document. |
 | [report-issue](workflow/report-issue/) | `workflow/report-issue` | Create GitHub issues from conversation context. |

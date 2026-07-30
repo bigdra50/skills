@@ -8,7 +8,7 @@
 ### APM (recommended)
 
 ```bash
-apm install bigdra50/skills/tooling/unilyze-setup
+apm install bigdra50/skills/unity/unilyze-setup
 ```
 
 Or declare it in `apm.yml` for a reproducible setup:
@@ -16,7 +16,7 @@ Or declare it in `apm.yml` for a reproducible setup:
 ```yaml
 dependencies:
   apm:
-    - bigdra50/skills/tooling/unilyze-setup
+    - bigdra50/skills/unity/unilyze-setup
 ```
 
 then run `apm install`.
@@ -37,7 +37,7 @@ npx skills add bigdra50/skills --skill unilyze-setup
 Or copy the folder in directly:
 
 ```bash
-npx degit bigdra50/skills/tooling/unilyze-setup ~/.claude/skills/unilyze-setup
+npx degit bigdra50/skills/unity/unilyze-setup ~/.claude/skills/unilyze-setup
 ```
 
 See [SKILL.md](./SKILL.md) for what this skill does and when to use it.

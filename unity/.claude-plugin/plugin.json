@@ -1,0 +1,29 @@
+{
+  "name": "bigdra50-unity",
+  "version": "0.1.0",
+  "description": "Unity / C# development skills — project bootstrap, CI, coding guides, the review system, and reviewer perspectives.",
+  "skills": [
+    "./asmdef-lint",
+    "./perspectives/performance-engineer",
+    "./perspectives/test-engineer",
+    "./perspectives/unity-architect",
+    "./perspectives/xr-specialist",
+    "./project-bootstrap",
+    "./review-architecture",
+    "./review-duplication",
+    "./review-hotspot",
+    "./review-metrics",
+    "./review-performance",
+    "./review-safety",
+    "./review-testing",
+    "./review-triage",
+    "./review-unity-specific",
+    "./review-weekly",
+    "./unilyze-setup",
+    "./unity-ci",
+    "./unity-cli-setup",
+    "./unity-csharp-guide",
+    "./unity-playmode-test",
+    "./visual-test"
+  ]
+}

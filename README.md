@@ -96,37 +96,8 @@ targets:
   - claude
 dependencies:
   apm:
-    # Review system — start with review-triage
-    - bigdra50/skills/unity/review-triage
-    - bigdra50/skills/unity/review-metrics
-    - bigdra50/skills/unity/review-architecture
-    - bigdra50/skills/unity/review-hotspot
-    - bigdra50/skills/unity/review-duplication
-    - bigdra50/skills/unity/review-performance
-    - bigdra50/skills/unity/review-safety
-    - bigdra50/skills/unity/review-testing
-    - bigdra50/skills/unity/review-unity-specific
-    - bigdra50/skills/unity/review-weekly
-    - bigdra50/skills/unity/perspectives/unity-architect
-    - bigdra50/skills/unity/perspectives/performance-engineer
-    - bigdra50/skills/unity/perspectives/xr-specialist
-    - bigdra50/skills/unity/perspectives/test-engineer
-
-    # Development
-    - bigdra50/skills/unity/asmdef-lint
-    - bigdra50/skills/unity/project-bootstrap
-    - bigdra50/skills/unity/visual-test
-    - bigdra50/skills/unity/unity-playmode-test
-
-    # Language guide
-    - bigdra50/skills/lang/unity-csharp-guide
-
-    # Tooling
-    - bigdra50/skills/tooling/unilyze-setup
-    - bigdra50/skills/tooling/unity-cli-setup
-
-    # DevOps
-    - bigdra50/skills/devops/unity-ci
+    # Every Unity / C# skill in this repo, as one entry
+    - bigdra50/skills/unity
 
     # Static analysis (from bigdra50/unilyze)
     - bigdra50/unilyze/src/Unilyze/Skills/quality-audit
@@ -134,6 +105,10 @@ dependencies:
 ```
 
 Then run `apm install` in the project root.
+
+`bigdra50/skills/unity` is a [plugin bundle](unity/.claude-plugin/plugin.json) covering
+every skill listed below. Individual skills still resolve by path
+(`bigdra50/skills/unity/review-triage`) when you want a subset instead.
 
 ### Recommended plugins (project-scoped)
 
@@ -174,10 +149,10 @@ Perspective sub-skills (dispatched in parallel by `review-weekly`): `unity/persp
 | [project-bootstrap](unity/project-bootstrap/) | Day 0 project setup checklist — asmdef structure, .editorconfig, CI, unilyze baseline. |
 | [visual-test](unity/visual-test/) | UXML resolvedStyle comparison for Figma-to-Unity visual testing. |
 | [unity-playmode-test](unity/unity-playmode-test/) | Unity UI Toolkit PlayMode test patterns with trap avoidance. |
-| [unity-csharp-guide](lang/unity-csharp-guide/) | C# in Unity patterns AI gets wrong — serialization, async/await, IL2CPP, hot-path allocations. |
-| [unilyze-setup](tooling/unilyze-setup/) | Set up unilyze — first snapshot, CI integration, SARIF, badges, baselines. |
-| [unity-cli-setup](tooling/unity-cli-setup/) | Set up unity-cli (`u` command) — installation, relay server, instance management. |
-| [unity-ci](devops/unity-ci/) | GitHub Actions CI/CD for Unity — GameCI, test matrix, unilyze quality gate. |
+| [unity-csharp-guide](unity/unity-csharp-guide/) | C# in Unity patterns AI gets wrong — serialization, async/await, IL2CPP, hot-path allocations. |
+| [unilyze-setup](unity/unilyze-setup/) | Set up unilyze — first snapshot, CI integration, SARIF, badges, baselines. |
+| [unity-cli-setup](unity/unity-cli-setup/) | Set up unity-cli (`u` command) — installation, relay server, instance management. |
+| [unity-ci](unity/unity-ci/) | GitHub Actions CI/CD for Unity — GameCI, test matrix, unilyze quality gate. |
 
 ## For 3DCG Development
 

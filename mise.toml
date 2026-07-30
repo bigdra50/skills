@@ -17,10 +17,38 @@ run = "deno run --allow-read --allow-write --allow-run=git scripts/gen-skill-rea
 description = "Verify each skill README is in sync with its SKILL.md"
 run = "deno run --allow-read --allow-run=git scripts/gen-skill-readme.ts --check"
 
+[tasks."gen:plugin-manifest"]
+description = "Generate the Claude plugin manifest for each bundled category"
+run = "deno run --allow-read --allow-write --allow-run=git scripts/gen-plugin-manifest.ts"
+
+[tasks."check:plugin-manifest"]
+description = "Verify each bundle manifest lists every skill under it"
+run = "deno run --allow-read --allow-run=git scripts/gen-plugin-manifest.ts --check"
+
+[tasks."check:staleness"]
+description = "Detect retired agent APIs and hardcoded model generations in tracked markdown"
+run = "deno run --allow-read --allow-run=git scripts/check-staleness.ts"
+
+[tasks."test:staleness"]
+description = "Run tests for the staleness checker"
+run = "deno test --allow-read --allow-write --allow-run scripts/check-staleness_test.ts"
+
 [tasks.test]
 description = "Run all checks"
-depends = ["test:frontmatter", "check:frontmatter", "check:readme"]
+depends = [
+  "test:frontmatter",
+  "test:staleness",
+  "check:frontmatter",
+  "check:readme",
+  "check:plugin-manifest",
+  "check:staleness",
+]
 
 [tasks.pre-commit]
 description = "Pre-commit gate"
-depends = ["check:frontmatter", "check:readme"]
+depends = [
+  "check:frontmatter",
+  "check:readme",
+  "check:plugin-manifest",
+  "check:staleness",
+]

@@ -48,7 +48,6 @@ For code review, use the built-in `/code-review`; for Unity/C# projects, use the
 | Skill | Install path | Description |
 |---|---|---|
 | [kb-claude-code](knowledge/kb-claude-code/) | `knowledge/kb-claude-code` | Claude Code configuration, hooks, MCP, parallel agent patterns. |
-| [kb-macos](knowledge/kb-macos/) | `knowledge/kb-macos` | macOS CLI techniques (osascript, ImageMagick, sips, mDNS). |
 
 ### Workflow
 
@@ -72,6 +71,7 @@ For code review, use the built-in `/code-review`; for Unity/C# projects, use the
 | [docs-architect](docs/docs-architect/) | `docs/docs-architect` | Repository documentation structure diagnosis and prescription. |
 | [html-reports](docs/html-reports/) | `docs/html-reports` | Structured HTML report management with templates. |
 | [html-reports-arch](docs/html-reports-arch/) | `docs/html-reports-arch` | Architecture visualization pages for html-reports. |
+| [japanese-tech-writing](docs/japanese-tech-writing/) | `docs/japanese-tech-writing` | Writing conventions for Japanese technical prose (Japanese-language skill). |
 | [sync-docs](docs/sync-docs/) | `docs/sync-docs` | Verify documentation against implementation code. |
 
 ### Design
@@ -80,12 +80,6 @@ For code review, use the built-in `/code-review`; for Unity/C# projects, use the
 |---|---|---|
 | [design-mockup](design/design-mockup/) | `design/design-mockup` | Generate interactive HTML mockups with viewport presets. |
 | [drawio](design/drawio/) | `design/drawio` | Generate draw.io diagrams with cross-platform CLI export. |
-
-### Misc
-
-| Skill | Install path | Description |
-|---|---|---|
-| [legacy-code-improvement](misc/legacy-code-improvement/) | `misc/legacy-code-improvement` | Legacy code improvement guide (Extract/Sprout + TDD). |
 
 ## For Unity / C# Development
 

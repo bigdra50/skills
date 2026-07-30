@@ -72,6 +72,11 @@ Skills for running the agent itself. Installable as one entry: `bigdra50/skills/
 |---|---|---|
 | [x-research](research/x-research/) | `research/x-research` | X (Twitter) information collection via web search (no API required). |
 
+Research capture and retrieval (`survey`, `ask`, `survey-paper`, `inbox-organize`, …)
+lives in [bigdra50/survey-any-tools](https://github.com/bigdra50/survey-any-tools),
+shipped alongside the CLI those skills drive. `apm install bigdra50/survey-any-tools`
+takes all nine.
+
 ### System
 
 | Skill | Install path | Description |

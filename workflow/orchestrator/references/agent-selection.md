@@ -41,13 +41,13 @@
 
 - `git status`, `git log`, `git diff`（読み取り系）
 - `ls`, ディレクトリ構造確認
-- TodoWrite更新
+- TaskCreate / TaskUpdate によるステータス更新
 - 小規模なファイル確認（数十行程度）
 
 ## Agent委譲時のプロンプト形式
 
 ```
-Task(
+Agent(
   subagent_type: "[Agent名]",
   prompt: "
     タスク: [具体的な指示]

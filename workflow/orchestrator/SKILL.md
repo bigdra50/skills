@@ -89,8 +89,8 @@ Blockers: (あれば記載)
 ### Phase 3: ステップ実行
 
 ```
-Task(
-  subagent_type: "Explore" | "Plan" | "code-reviewer" | "default",
+Agent(
+  subagent_type: "Explore" | "Plan" | "code-reviewer" | "general-purpose",
   prompt: "タスク: ... スコープ: ... 前ステップから: [Handoff情報]"
 )
 ```
@@ -133,9 +133,9 @@ Task(
 4. コストが高い操作（大量API呼び出し、長時間処理）
 5. 調査系タスクの中間成果確認
 
-## TodoWriteとの連携
+## タスク管理ツールとの連携
 
-実行中は常にTodoWriteでステータスを可視化:
+実行中は常に TaskCreate / TaskUpdate でステータスを可視化:
 
 ```
 Step 1: 情報収集

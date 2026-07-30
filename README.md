@@ -37,11 +37,12 @@ Language / domain agnostic. Install globally via `apm install -g`.
 ### Review
 
 For code review, use the built-in `/code-review`; for Unity/C# projects, use the [Unity review system](#unity--c-review-system).
+To iterate until findings stop, wrap a review in `/goal` rather than reaching for a loop skill.
 
 | Skill | Install path | Description |
 |---|---|---|
-| [plan-loop](review/plan-loop/) | `review/plan-loop` | Iterative design plan review loop. |
 | [google-code-review](review/google-code-review/) | `review/google-code-review` | Google code review standards — 10 review dimensions. |
+| [second-opinion](review/second-opinion/) | `review/second-opinion` | One review pass by a model that did not write the code — Codex or Copilot. |
 
 ### GitHub
 

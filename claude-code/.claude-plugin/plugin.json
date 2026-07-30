@@ -1,0 +1,13 @@
+{
+  "name": "bigdra50-claude-code",
+  "version": "0.1.0",
+  "description": "Skills for running Claude Code itself — session logs, usage stats, compaction prep, task orchestration, and configuration knowledge.",
+  "skills": [
+    "./claude-stats",
+    "./compact-prep",
+    "./kb-claude-code",
+    "./orchestrator",
+    "./session-recap",
+    "./worklog"
+  ]
+}

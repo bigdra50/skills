@@ -43,26 +43,40 @@ For code review, use the built-in `/code-review`; for Unity/C# projects, use the
 | [plan-loop](review/plan-loop/) | `review/plan-loop` | Iterative design plan review loop. |
 | [google-code-review](review/google-code-review/) | `review/google-code-review` | Google code review standards — 10 review dimensions. |
 
-### Knowledge
+### GitHub
+
+Installable as one entry: `bigdra50/skills/github`.
 
 | Skill | Install path | Description |
 |---|---|---|
-| [kb-claude-code](knowledge/kb-claude-code/) | `knowledge/kb-claude-code` | Claude Code configuration, hooks, MCP, parallel agent patterns. |
+| [creating-pull-requests](github/creating-pull-requests/) | `github/creating-pull-requests` | PR creation with structured description and anti-patterns. |
+| [pr-brief](github/pr-brief/) | `github/pr-brief` | Convert branch diff into a reviewer-friendly briefing document. |
+| [report-issue](github/report-issue/) | `github/report-issue` | Create GitHub issues from conversation context. |
 
-### Workflow
+### Claude Code
+
+Skills for running the agent itself. Installable as one entry: `bigdra50/skills/claude-code`.
 
 | Skill | Install path | Description |
 |---|---|---|
-| [claude-stats](workflow/claude-stats/) | `workflow/claude-stats` | Aggregate Claude Code usage statistics. |
-| [cc-worklog](workflow/cc-worklog/) | `workflow/cc-worklog` | Generate daily work reports from session logs. |
-| [compact-prep](workflow/compact-prep/) | `workflow/compact-prep` | Save session state to a temp file before /compact so recovery survives context compaction. |
-| [creating-pull-requests](workflow/creating-pull-requests/) | `workflow/creating-pull-requests` | PR creation with structured description and anti-patterns. |
-| [disk-usage](workflow/disk-usage/) | `workflow/disk-usage` | Disk usage investigation and tiered cleanup. |
-| [orchestrator](workflow/orchestrator/) | `workflow/orchestrator` | Multi-step task decomposition with parallel sub-tasks. |
-| [pr-brief](workflow/pr-brief/) | `workflow/pr-brief` | Convert branch diff into a reviewer-friendly briefing document. |
-| [report-issue](workflow/report-issue/) | `workflow/report-issue` | Create GitHub issues from conversation context. |
-| [session-recap](workflow/session-recap/) | `workflow/session-recap` | Analyze past sessions and generate workflow documentation. |
-| [x-research](workflow/x-research/) | `workflow/x-research` | X (Twitter) information collection via web search (no API required). |
+| [claude-stats](claude-code/claude-stats/) | `claude-code/claude-stats` | Aggregate Claude Code usage statistics. |
+| [compact-prep](claude-code/compact-prep/) | `claude-code/compact-prep` | Save session state to a temp file before /compact so recovery survives context compaction. |
+| [kb-claude-code](claude-code/kb-claude-code/) | `claude-code/kb-claude-code` | Claude Code configuration, hooks, MCP, parallel agent patterns. |
+| [orchestrator](claude-code/orchestrator/) | `claude-code/orchestrator` | Multi-step task decomposition with parallel sub-tasks. |
+| [session-recap](claude-code/session-recap/) | `claude-code/session-recap` | Analyze past sessions and generate workflow documentation. |
+| [worklog](claude-code/worklog/) | `claude-code/worklog` | Generate daily work reports from session logs. |
+
+### Research
+
+| Skill | Install path | Description |
+|---|---|---|
+| [x-research](research/x-research/) | `research/x-research` | X (Twitter) information collection via web search (no API required). |
+
+### System
+
+| Skill | Install path | Description |
+|---|---|---|
+| [disk-usage](system/disk-usage/) | `system/disk-usage` | Disk usage investigation and tiered cleanup. |
 
 ### Docs
 

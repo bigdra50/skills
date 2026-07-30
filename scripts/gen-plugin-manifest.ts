@@ -25,6 +25,20 @@ const BUNDLES: Bundle[] = [
       "Unity / C# development skills — project bootstrap, CI, coding guides, the review system, and reviewer perspectives.",
     version: "0.1.0",
   },
+  {
+    root: "github",
+    name: "bigdra50-github",
+    description:
+      "GitHub workflow skills — pull request creation, reviewer briefings, and issue reporting.",
+    version: "0.1.0",
+  },
+  {
+    root: "claude-code",
+    name: "bigdra50-claude-code",
+    description:
+      "Skills for running Claude Code itself — session logs, usage stats, compaction prep, task orchestration, and configuration knowledge.",
+    version: "0.1.0",
+  },
 ];
 
 const MANIFEST_PATH = ".claude-plugin/plugin.json";

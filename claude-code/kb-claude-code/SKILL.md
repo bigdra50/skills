@@ -136,7 +136,7 @@ CLAUDE.md だけでなく、機械可読な状態ファイル（`current_tasks/`
 while true; do
     claude --dangerously-skip-permissions \
            -p "$(cat AGENT_PROMPT.md)" \
-           --model claude-opus-4-6 &> "agent_logs/agent_$(date +%s).log"
+           --model opus &> "agent_logs/agent_$(date +%s).log"
 done
 ```
 

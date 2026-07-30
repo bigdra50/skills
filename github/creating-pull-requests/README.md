@@ -8,7 +8,7 @@
 ### APM (recommended)
 
 ```bash
-apm install bigdra50/skills/workflow/creating-pull-requests
+apm install bigdra50/skills/github/creating-pull-requests
 ```
 
 Or declare it in `apm.yml` for a reproducible setup:
@@ -16,7 +16,7 @@ Or declare it in `apm.yml` for a reproducible setup:
 ```yaml
 dependencies:
   apm:
-    - bigdra50/skills/workflow/creating-pull-requests
+    - bigdra50/skills/github/creating-pull-requests
 ```
 
 then run `apm install`.
@@ -37,7 +37,7 @@ npx skills add bigdra50/skills --skill creating-pull-requests
 Or copy the folder in directly:
 
 ```bash
-npx degit bigdra50/skills/workflow/creating-pull-requests ~/.claude/skills/creating-pull-requests
+npx degit bigdra50/skills/github/creating-pull-requests ~/.claude/skills/creating-pull-requests
 ```
 
 See [SKILL.md](./SKILL.md) for what this skill does and when to use it.

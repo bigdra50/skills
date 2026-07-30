@@ -8,7 +8,7 @@
 ### APM (recommended)
 
 ```bash
-apm install bigdra50/skills/workflow/session-recap
+apm install bigdra50/skills/claude-code/session-recap
 ```
 
 Or declare it in `apm.yml` for a reproducible setup:
@@ -16,7 +16,7 @@ Or declare it in `apm.yml` for a reproducible setup:
 ```yaml
 dependencies:
   apm:
-    - bigdra50/skills/workflow/session-recap
+    - bigdra50/skills/claude-code/session-recap
 ```
 
 then run `apm install`.
@@ -37,7 +37,7 @@ npx skills add bigdra50/skills --skill session-recap
 Or copy the folder in directly:
 
 ```bash
-npx degit bigdra50/skills/workflow/session-recap ~/.claude/skills/session-recap
+npx degit bigdra50/skills/claude-code/session-recap ~/.claude/skills/session-recap
 ```
 
 See [SKILL.md](./SKILL.md) for what this skill does and when to use it.

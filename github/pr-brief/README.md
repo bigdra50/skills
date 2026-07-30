@@ -8,7 +8,7 @@
 ### APM (recommended)
 
 ```bash
-apm install bigdra50/skills/workflow/pr-brief
+apm install bigdra50/skills/github/pr-brief
 ```
 
 Or declare it in `apm.yml` for a reproducible setup:
@@ -16,7 +16,7 @@ Or declare it in `apm.yml` for a reproducible setup:
 ```yaml
 dependencies:
   apm:
-    - bigdra50/skills/workflow/pr-brief
+    - bigdra50/skills/github/pr-brief
 ```
 
 then run `apm install`.
@@ -37,7 +37,7 @@ npx skills add bigdra50/skills --skill pr-brief
 Or copy the folder in directly:
 
 ```bash
-npx degit bigdra50/skills/workflow/pr-brief ~/.claude/skills/pr-brief
+npx degit bigdra50/skills/github/pr-brief ~/.claude/skills/pr-brief
 ```
 
 See [SKILL.md](./SKILL.md) for what this skill does and when to use it.

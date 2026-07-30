@@ -8,7 +8,7 @@
 ### APM (recommended)
 
 ```bash
-apm install bigdra50/skills/workflow/x-research
+apm install bigdra50/skills/research/x-research
 ```
 
 Or declare it in `apm.yml` for a reproducible setup:
@@ -16,7 +16,7 @@ Or declare it in `apm.yml` for a reproducible setup:
 ```yaml
 dependencies:
   apm:
-    - bigdra50/skills/workflow/x-research
+    - bigdra50/skills/research/x-research
 ```
 
 then run `apm install`.
@@ -37,7 +37,7 @@ npx skills add bigdra50/skills --skill x-research
 Or copy the folder in directly:
 
 ```bash
-npx degit bigdra50/skills/workflow/x-research ~/.claude/skills/x-research
+npx degit bigdra50/skills/research/x-research ~/.claude/skills/x-research
 ```
 
 See [SKILL.md](./SKILL.md) for what this skill does and when to use it.

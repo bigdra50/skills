@@ -1,0 +1,10 @@
+{
+  "name": "bigdra50-github",
+  "version": "0.1.0",
+  "description": "GitHub workflow skills — pull request creation, reviewer briefings, and issue reporting.",
+  "skills": [
+    "./creating-pull-requests",
+    "./pr-brief",
+    "./report-issue"
+  ]
+}

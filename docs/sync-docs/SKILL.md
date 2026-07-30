@@ -36,7 +36,7 @@ find <target> -name "*.md" -type f
 各バッチをExplore agentで並列検証:
 
 ```
-Task(subagent_type="Explore", prompt="""
+Agent(subagent_type="Explore", prompt="""
 タスク: <対象ドキュメント> を実装と照合
 
 検証項目:
@@ -83,7 +83,7 @@ Task(subagent_type="Explore", prompt="""
 general-purpose agent で並列修正:
 
 ```
-Task(subagent_type="general-purpose", prompt="""
+Agent(subagent_type="general-purpose", prompt="""
 タスク: <対象ファイル> を修正
 
 修正内容:

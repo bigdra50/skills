@@ -244,7 +244,7 @@ scent.key_terms (3 件以上) / tags / related が補完されている。
 - 途中でユーザーがキャンセルしたければ `/goal clear`
 - 現在の goal を確認したければ引数なしで `/goal`
 
-### Phase 3: 分析タスクの動的生成 (TaskCreate / TodoWrite)
+### Phase 3: 分析タスクの動的生成 (TaskCreate)
 
 決定した各 page に必要な分析を **動的にタスク化**する。
 ハードコードしたチェックリストは使わず、偵察結果に応じて適切なタスクを組み立てる。
@@ -326,7 +326,7 @@ Agent(
 | データ変換ポイント抽出 | Explore | `{ from_type, to_type, location }` |
 | 用語抽出 (固有名詞) | Explore | `[{ term, definition_hint, location }]` |
 
-TodoWrite で全タスクを可視化し、進捗をユーザーに見せる。
+TaskCreate / TaskUpdate で全タスクを可視化し、進捗をユーザーに見せる。
 
 ### Phase 4: 委譲実行 (Agent.parallel)
 

@@ -32,16 +32,11 @@ Run `review-triage` first. Triage records the app type, which sets whether test 
 
 3. **Check CI integration.**
    ```bash
-   grep -rln "test-framework\|game-ci\|u tests run\|unity-test-runner\|-runTests" <project>/.github/workflows <project>/.gitlab-ci.yml 2>/dev/null
+   grep -rln "test-framework\|game-ci\|unity test\|unity-test-runner\|-runTests" <project>/.github/workflows <project>/.gitlab-ci.yml 2>/dev/null
    ```
    Note whether CI runs EditMode, PlayMode, or both, and whether it uploads coverage.
 
-4. **Count tests if unity-cli is available** (needs the Editor project open; skip if offline).
-   ```bash
-   u tests list edit -p <project>
-   u tests list play -p <project>
-   ```
-   If `u` is unavailable, count `[Test]` / `[UnityTest]` occurrences as an estimate and label it an estimate:
+4. **Count tests.** The `unity` CLI runs tests but cannot enumerate them, so count attributes and label the number an estimate. Split EditMode from PlayMode by the test assembly each file belongs to, not by the attribute — `[Test]` appears in both.
    ```bash
    grep -rho "\[Test\]\|\[UnityTest\]" <project> --include=*.cs | wc -l
    ```
@@ -74,7 +69,7 @@ Rate each dimension. `✓` / `✗` / `partial`.
 | CI runs tests | workflow invokes a test runner | |
 | CI runs both modes | workflow runs EditMode AND PlayMode | |
 | Coverage tooling | `com.unity.testtools.codecoverage` present | |
-| Test count (EditMode / PlayMode) | `u tests list` or `[Test]` estimate | |
+| Test count (EditMode / PlayMode) | `[Test]` / `[UnityTest]` count per test assembly (estimate) | |
 
 ## Test design quality checklist
 

@@ -21,7 +21,6 @@
     "./review-weekly",
     "./unilyze-setup",
     "./unity-ci",
-    "./unity-cli-setup",
     "./unity-csharp-guide"
   ]
 }

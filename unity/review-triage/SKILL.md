@@ -1,8 +1,8 @@
 ---
 name: review-triage
 description: >-
-  Day 0 assessment for a Unity project. Runs unilyze snapshot and
-  u project info to produce a scorecard covering CodeHealth, assembly
+  Day 0 assessment for a Unity project. Runs a unilyze snapshot and
+  unity projects info to produce a scorecard covering CodeHealth, assembly
   structure, test posture, Unity version, and top 3 risks.
   Does NOT propose fixes — those come from the other unity-review-* skills.
 ---
@@ -37,12 +37,12 @@ The app type determines which thresholds are P0 vs P1 in the scorecard:
 
 0. **Project metadata** — run offline, no Editor needed.
    ```bash
-   u project info -p <project>
-   u project version -p <project>
-   u project packages -p <project>
-   u project assemblies -p <project>
+   unity projects info <project>
+   find <project> -name '*.asmdef' -not -path '*/Library/*'
    ```
-   If `u` is not installed: read `ProjectSettings/ProjectVersion.txt`, `Packages/manifest.json`, and `find . -name "*.asmdef"` directly.
+   `unity projects info` reports the editor version, installed packages, build target, scripting backend, and render pipeline in one call, and reads the project from disk rather than talking to a running Editor. Assemblies have no CLI equivalent, hence the `find`.
+
+   If the `unity` CLI is not installed: read `ProjectSettings/ProjectVersion.txt` and `Packages/manifest.json` directly; the `find` works unchanged.
 
 1. **unilyze snapshot** — static analysis.
    ```bash

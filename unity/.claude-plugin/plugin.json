@@ -22,8 +22,6 @@
     "./unilyze-setup",
     "./unity-ci",
     "./unity-cli-setup",
-    "./unity-csharp-guide",
-    "./unity-playmode-test",
-    "./visual-test"
+    "./unity-csharp-guide"
   ]
 }

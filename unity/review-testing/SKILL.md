@@ -5,7 +5,7 @@ description: >-
   EditMode vs PlayMode coverage, CI integration, coverage tooling, and test
   design quality. Produces a scorecard plus a gap list of assemblies with no
   corresponding tests. Does NOT write tests, does NOT run tests (that is
-  run-tests / unity-verify), and does NOT evaluate code-quality metrics
+  run-tests), and does NOT evaluate code-quality metrics
   (review-metrics).
 ---
 
@@ -151,7 +151,7 @@ Keep it under 180 lines.
 ## Boundaries
 
 - Do NOT write tests. Test authoring is a separate task (`test-writing-guide` / `failing-test-writer`).
-- Do NOT run tests. Running is `run-tests` (unity-cli) or `unity-verify`; this skill only inspects posture.
+- Do NOT run tests. Running is `run-tests` (unity-coding-skills); this skill only inspects posture.
 - Do NOT evaluate code-quality metrics (CodeHealth, GodClass, complexity) — that is `review-metrics`.
 - Do NOT design specific test cases — that is `test-designing-guide` at implementation time.
 - Do NOT modify project files except under `<project>/.unity-review/`.

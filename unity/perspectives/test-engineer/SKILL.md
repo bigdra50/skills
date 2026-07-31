@@ -1,7 +1,7 @@
 ---
 name: test-engineer
 description: >-
-  Perspective agent for unity-review-weekly. Reviews outputs through the
+  Perspective agent for review-weekly. Reviews outputs through the
   lens of a test engineer — test strategy coverage, EditMode vs PlayMode
   balance, fixture design, CI reliability, flaky test patterns.
 ---

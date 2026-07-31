@@ -6,7 +6,7 @@ description: >-
   Produces an impact-ranked findings table pointing at the offending method and
   line. Does NOT refactor, does NOT evaluate non-performance smells (that is
   review-metrics / review-safety), and does NOT profile at runtime — runtime
-  profiling needs the Unity Editor and the unity-perf skill from unity-cli.
+  profiling needs the Unity Editor and `u profiler` from unity-cli.
 ---
 
 # Unity Review — Performance
@@ -68,7 +68,7 @@ Run `review-triage` first. Triage records `energyPressure`, app type, and script
 
 ## Cysharp optimization categories
 
-For each finding, name the applicable category from the `csharp-perf-optimizer` knowledge (Cysharp/neuecc OSS). Report the category; do NOT apply the fix here.
+For each finding, name the applicable category from the table below (Cysharp/neuecc OSS conventions). Report the category; do NOT apply the fix here.
 
 | Category | Applies to | Unity-preferred tool |
 |----------|-----------|----------------------|
@@ -113,7 +113,7 @@ energyPressure: <value> (<healthy/warning/alert>)  |  app type: <type>  |  backe
 
 ## Notes
 - (findings the tool cannot see: base-class-hidden MonoBehaviours, transitive hot paths)
-- Measured frame cost is NOT included — run runtime profiling to confirm (unity-perf).
+- Measured frame cost is NOT included — run runtime profiling to confirm (`u profiler`).
 ```
 
 Keep it under 200 lines. If you are writing prose paragraphs per finding, you are reviewing instead of cataloguing.
@@ -123,7 +123,7 @@ Keep it under 200 lines. If you are writing prose paragraphs per finding, you ar
 - Do NOT refactor or edit project code. This skill flags; fixes are a separate task.
 - Do NOT evaluate quality smells (GodClass, LongMethod, HighComplexity, coupling, cohesion) — that is `review-metrics`.
 - Do NOT evaluate safety smells (`AsyncVoidMethod`, `BlockingTaskWait`, `CatchAllException`, exception smells) — that is `review-safety`.
-- Do NOT profile at runtime or quote measured ms/GC bytes. Runtime profiling needs the Unity Editor + the `unity-perf` skill from `unity-cli`.
+- Do NOT profile at runtime or quote measured ms/GC bytes. Runtime profiling needs the Unity Editor + `u profiler` from unity-cli.
 - Do NOT modify project files except under `<project>/.unity-review/`.
 
 ## Related
@@ -133,4 +133,4 @@ Keep it under 200 lines. If you are writing prose paragraphs per finding, you ar
 - `review-safety` — async / exception / disposal smells
 - `lang/unity-csharp-guide` — C# in Unity patterns; covers the same allocation traps from the coding side
 - `performance-engineer` (perspective) — reads this skill's output for `review-weekly` frame-budget commentary
-- `unity-perf` (unity-cli) — the runtime profiler this skill defers measured numbers to
+- `u profiler` (unity-cli) — the runtime profiler this skill defers measured numbers to

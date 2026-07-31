@@ -134,6 +134,6 @@ Add the GitHub Actions pipeline from the `unity-ci` skill: compile + EditMode/Pl
 
 ## Related skills
 
-- `unity-dev/asmdef-lint` — validates the assembly structure this skill lays down.
+- `asmdef-lint` — validates the assembly structure this skill lays down.
 - `devops/unity-ci` — the CI pipeline referenced above.
 - `unity-review/review-triage` — Day 0 scorecard once the project has code to measure.

@@ -1,7 +1,7 @@
 ---
 name: unity-architect
 description: >-
-  Perspective agent for unity-review-weekly. Reviews triage and observation
+  Perspective agent for review-weekly. Reviews triage and observation
   skill outputs through the lens of a Unity architect — asmdef layering,
   dependency direction, separation of concerns, platform abstraction.
 ---

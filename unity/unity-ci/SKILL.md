@@ -184,6 +184,6 @@ jobs:
 
 ## Related skills
 
-- `unity-dev/asmdef-lint` — a cheap pre-build assembly-structure check that can run before compile.
-- `unity-dev/project-bootstrap` — sets up the project layout and unilyze baseline this pipeline gates against.
+- `asmdef-lint` — a cheap pre-build assembly-structure check that can run before compile.
+- `project-bootstrap` — sets up the project layout and unilyze baseline this pipeline gates against.
 - `unity-review/review-testing` — deeper analysis of the test posture this pipeline exercises.

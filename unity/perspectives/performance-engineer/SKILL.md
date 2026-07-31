@@ -1,7 +1,7 @@
 ---
 name: performance-engineer
 description: >-
-  Perspective agent for unity-review-weekly. Reviews outputs through the
+  Perspective agent for review-weekly. Reviews outputs through the
   lens of a Unity performance engineer — frame budget, GC pressure,
   draw calls, Burst/DOTS readiness, mobile thermal constraints.
 ---

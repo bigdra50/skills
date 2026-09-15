@@ -89,8 +89,6 @@ takes all nine.
 | Skill | Install path | Description |
 |---|---|---|
 | [docs-architect](docs/docs-architect/) | `docs/docs-architect` | Repository documentation structure diagnosis and prescription. |
-| [html-reports](docs/html-reports/) | `docs/html-reports` | Structured HTML report management with templates. |
-| [html-reports-arch](docs/html-reports-arch/) | `docs/html-reports-arch` | Architecture visualization pages for html-reports. |
 | [japanese-tech-writing](docs/japanese-tech-writing/) | `docs/japanese-tech-writing` | Writing conventions for Japanese technical prose (Japanese-language skill). |
 | [sync-docs](docs/sync-docs/) | `docs/sync-docs` | Verify documentation against implementation code. |
 

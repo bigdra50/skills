@@ -30,7 +30,7 @@ them without APM:
 npx skills add bigdra50/skills --skill <skill-name>
 ```
 
-## Skills — Global
+## Global skills
 
 Language / domain agnostic. Install globally via `apm install -g`.
 
@@ -41,8 +41,8 @@ To iterate until findings stop, wrap a review in `/goal` rather than reaching fo
 
 | Skill | Install path | Description |
 |---|---|---|
-| [google-code-review](review/google-code-review/) | `review/google-code-review` | Google code review standards — 10 review dimensions. |
-| [second-opinion](review/second-opinion/) | `review/second-opinion` | One review pass by a model that did not write the code — Codex or Copilot. |
+| [google-code-review](review/google-code-review/) | `review/google-code-review` | Reviews against Google's code review standards across 10 dimensions. |
+| [second-opinion](review/second-opinion/) | `review/second-opinion` | One review pass by Codex or Copilot, a model that did not write the code. |
 
 ### GitHub
 
@@ -73,10 +73,9 @@ Skills for running the agent itself. Installable as one entry: `bigdra50/skills/
 |---|---|---|
 | [x-research](research/x-research/) | `research/x-research` | X (Twitter) information collection via web search (no API required). |
 
-Research capture and retrieval (`survey`, `ask`, `survey-paper`, `inbox-organize`, …)
-lives in [bigdra50/survey-any-tools](https://github.com/bigdra50/survey-any-tools),
-shipped alongside the CLI those skills drive. `apm install bigdra50/survey-any-tools`
-takes all nine.
+Research capture and retrieval skills live in [bigdra50/survey-any-tools](https://github.com/bigdra50/survey-any-tools).
+They include `survey`, `ask`, `survey-paper`, and `inbox-organize`, and ship alongside the CLI they drive.
+`apm install bigdra50/survey-any-tools` takes all nine.
 
 ### System
 
@@ -99,9 +98,20 @@ takes all nine.
 | [design-mockup](design/design-mockup/) | `design/design-mockup` | Generate interactive HTML mockups with viewport presets. |
 | [drawio](design/drawio/) | `design/drawio` | Generate draw.io diagrams with cross-platform CLI export. |
 
+### Jev
+
+For [Jev](https://docs.typesafe.ai/introduction), TypeSafe's System One model.
+The skill here decides whether Jev fits.
+To build with Jev, use TypeSafe's official [typesafe-ai skill](https://github.com/typesafe-ai/skills).
+
+| Skill | Install path | Description |
+|---|---|---|
+| [jev-fit](jev/jev-fit/) | `jev/jev-fit` | Consult on whether Jev would improve the work at hand. Screens each decision point, and "nothing fits" is a valid result. |
+
 ## For Unity / C# Development
 
-Unity and C# skills are **project-scoped** — install them per-project, not globally.
+Unity and C# skills are project-scoped.
+Install them per project, not globally.
 
 ### Setup
 
@@ -146,31 +156,32 @@ Use `review-weekly` to orchestrate all review skills together.
 
 | Skill | Description |
 |---|---|
-| [review-triage](unity/review-triage/) | Day 0 scorecard — CodeHealth, assembly structure, test posture, top 3 risks. |
+| [review-triage](unity/review-triage/) | Day 0 scorecard: CodeHealth, assembly structure, test posture, top 3 risks. |
 | [review-metrics](unity/review-metrics/) | Per-type metric deep-dive with unilyze evidence packs. |
-| [review-architecture](unity/review-architecture/) | Assembly (asmdef) structure — dependency direction, DfMS, cyclic deps. |
+| [review-architecture](unity/review-architecture/) | Assembly (asmdef) structure: dependency direction, DfMS, cyclic deps. |
 | [review-hotspot](unity/review-hotspot/) | Git churn x complexity refactoring priorities. |
 | [review-duplication](unity/review-duplication/) | Code clone detection and classification. |
 | [review-performance](unity/review-performance/) | Unity hot-path smells, GC allocation, Burst/DOTS readiness. |
 | [review-safety](unity/review-safety/) | Async patterns, exception handling, resource disposal. |
-| [review-testing](unity/review-testing/) | Test posture — EditMode/PlayMode coverage, CI, test design quality. |
+| [review-testing](unity/review-testing/) | Test posture: EditMode/PlayMode coverage, CI, test design quality. |
 | [review-unity-specific](unity/review-unity-specific/) | Unity-specific gotchas no static analyzer catches. |
-| [review-weekly](unity/review-weekly/) | Weekly orchestrator — runs all observation skills, dispatches perspectives, diffs KPIs. |
+| [review-weekly](unity/review-weekly/) | Weekly orchestrator that runs all observation skills, dispatches perspectives, and diffs KPIs. |
 
-Perspective sub-skills (dispatched in parallel by `review-weekly`): `unity/perspectives/{unity-architect, performance-engineer, xr-specialist, test-engineer}`.
+`review-weekly` dispatches the perspective sub-skills in parallel.
+They live under `unity/perspectives/`: `unity-architect`, `performance-engineer`, `xr-specialist`, and `test-engineer`.
 
 ### Unity Development Skills
 
 | Skill | Description |
 |---|---|
-| [asmdef-lint](unity/asmdef-lint/) | Assembly Definition structure validation — naming, dependency direction, test assemblies. |
-| [project-bootstrap](unity/project-bootstrap/) | Day 0 project setup checklist — asmdef structure, .editorconfig, CI, unilyze baseline. |
+| [asmdef-lint](unity/asmdef-lint/) | Assembly Definition structure validation: naming, dependency direction, test assemblies. |
+| [project-bootstrap](unity/project-bootstrap/) | Day 0 project setup checklist: asmdef structure, .editorconfig, CI, unilyze baseline. |
 | [visual-test](unity/visual-test/) | UXML resolvedStyle comparison for Figma-to-Unity visual testing. |
 | [unity-playmode-test](unity/unity-playmode-test/) | Unity UI Toolkit PlayMode test patterns with trap avoidance. |
-| [unity-csharp-guide](unity/unity-csharp-guide/) | C# in Unity patterns AI gets wrong — serialization, async/await, IL2CPP, hot-path allocations. |
-| [unilyze-setup](unity/unilyze-setup/) | Set up unilyze — first snapshot, CI integration, SARIF, badges, baselines. |
-| [unity-cli-setup](unity/unity-cli-setup/) | Set up unity-cli (`u` command) — installation, relay server, instance management. |
-| [unity-ci](unity/unity-ci/) | GitHub Actions CI/CD for Unity — GameCI, test matrix, unilyze quality gate. |
+| [unity-csharp-guide](unity/unity-csharp-guide/) | C# in Unity patterns AI gets wrong: serialization, async/await, IL2CPP, hot-path allocations. |
+| [unilyze-setup](unity/unilyze-setup/) | Set up unilyze: first snapshot, CI integration, SARIF, badges, baselines. |
+| [unity-cli-setup](unity/unity-cli-setup/) | Set up unity-cli (`u` command): installation, relay server, instance management. |
+| [unity-ci](unity/unity-ci/) | GitHub Actions CI/CD for Unity: GameCI, test matrix, unilyze quality gate. |
 
 ## For 3DCG Development
 

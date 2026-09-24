@@ -5,9 +5,6 @@ description: |
     約 50 OSS の構成調査 (survey-any: oss-documentation-structure-patterns) に基づき、
     「診断 → 処方 → 承認 → 適用 → 検証」のパイプラインで段階に合った構成を処方する。
     モード: audit (診断のみ) / init (新規雛形) / grow (増築) / restructure (構造再編)。
-    Use when: ユーザーが「ドキュメント整備して」「docs の雛形作って」「README 整理したい」
-    「ドキュメント構成を診断して」「docs が陳腐化してるので再編したい」「docs-architect」
-    「ドキュメント構造を見直したい」「この repo に必要なドキュメントは?」と依頼したとき。
     新規 OSS リポジトリの立ち上げ、コードが動き始めた段階での docs 着手、
     既存 docs の大規模リストラクチャのいずれにも使う。
 license: MIT

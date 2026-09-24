@@ -2,7 +2,6 @@
 name: sync-docs
 description: |
   ドキュメントと実装コードを照合し、古い記述・誤りを特定して修正する。
-  Use for: "ドキュメント検証", "docs同期", "実装と照合", "ドキュメント更新", "sync-docs"
 user-invocable: true
 ---
 

@@ -5,9 +5,7 @@ description: >-
   アップロード (Add build) する個人スキル。公式 evenhub CLI に upload コマンドが無いため、Web UI と
   同等の非公式 API (POST /api/v1/versions/draft → /api/v1/versions/create) を直接呼ぶ。追加される
   ビルドは Private (公開=Private→Public 切替は別操作で、本スキルは行わない)。
-  Use when 「Even Hub にアップロード」「ビルドをアップロード」「Add build」「ehpk を上げる/上げて」
-  「ハブに上げて」「(Even G2 の) ビルドを公開準備」「upload to even hub」「add build to even hub」
-  と言われたとき、または Even Realities G2 / Even Hub アプリの .ehpk をハブに登録したいとき。
+  Use when Even Realities G2 / Even Hub アプリの .ehpk をハブに登録したいとき。
   公式 everything-evenhub プラグインとは別の、個人用の補完スキル。
 ---
 

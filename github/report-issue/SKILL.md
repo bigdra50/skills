@@ -2,7 +2,6 @@
 name: report-issue
 description: |
   会話の文脈から GitHub issue (バグ/機能要望/タスク) を作成する。環境情報を自動収集し、既存issueの重複を検索し、作成前に確認する。
-  Use for: "issue作って", "issue化して", "バグ報告", "これをissueに", "GitHubに報告", "/report-issue"
 user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion
 ---
@@ -17,7 +16,7 @@ allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion
 ## 絶対ルール
 
 - issue 本文・タイトルのどこにも Claude / AI / エージェント / アシスタントへの言及を入れない。
-- `~/.claude/rules/writing-style.md` を適用する（修飾語濫用・定型句・誇張を避ける。1文30語以下、一文一行）。
+- `~/.claude/rules/writing-style.md` を適用する。
 - `~/.claude/rules/commit.md` の言語ポリシーと自動link回避を適用する（後述）。
 - 作成は必ずユーザーの確認後（ステップ5）。勝手に作らない。
 

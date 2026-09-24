@@ -42,7 +42,6 @@ own config, and a generation written into a skill goes stale with nothing to cat
 **`fable`** — the Agent tool with `model: "fable"`, `subagent_type: "general-purpose"`, and
 `run_in_background: false`. Hand it the target, the files, and the dimensions. Do **not** summarize your own
 reasoning into the prompt: an unread context is the thing being bought, and narrating your intent spends it.
-Avoid `opus-code-reviewer` — it filters to high-priority findings, which is the failure documented below.
 
 **`codex` / `copilot`** — the agents of the same name. They add vendor decorrelation on top of the fresh
 context, at the cost of CLI authentication and sandbox path access.

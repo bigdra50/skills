@@ -36,11 +36,11 @@ user-invocable: true
 | `comparison.html` | テンプレなし。overview を base に LLM がスクラッチ生成 |
 | `index.html` | テンプレ骨格を base に簡単な書き換え |
 
-## ⚠️ 過適合 anti-pattern (最重要)
+## examples/ を設計の手本にしない
 
-`examples/` の完成例 (eveng2-reader-settings 等) を **絶対に「真似すべき設計」として参照しない**。examples は generic 基盤の動作確認用であり、view 関数・SAMPLE データ・画面名は固有のドメインに密着している。
+`examples/` の完成例 (eveng2-reader-settings 等) は generic 基盤の動作確認用で、view 関数・SAMPLE データ・画面名は元のドメインに密着している。新しいモックアップの設計の手本にはしない。
 
-**模倣禁止リスト** (詳細は `examples/README.md`):
+流用しない要素 (詳細は `examples/README.md`):
 - view 関数の構造 (`listView` / `detailView` / `readingView` 等の名前と中身)
 - SAMPLE 配列のデータ形 (例の `{ id, title, byline, ... }` 構造)
 - flowFrames / flowEdges の画面名・ラベル

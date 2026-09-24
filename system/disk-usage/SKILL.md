@@ -2,7 +2,6 @@
 name: disk-usage
 description: |
   ディスク使用量の調査・分析・クリーンアップ支援。mise run disk-usage を活用してレポート取得し、結果を分析して削除候補を提示する。
-  Use for: "ディスク容量", "容量確認", "ディスク不足", "空き容量", "クリーンアップ", "キャッシュ削除", "disk usage", "disk full"
 allowed-tools: Bash, Read, Glob
 user-invocable: true
 ---

@@ -89,6 +89,7 @@ They include `survey`, `ask`, `survey-paper`, and `inbox-organize`, and ship alo
 |---|---|---|
 | [docs-architect](docs/docs-architect/) | `docs/docs-architect` | Repository documentation structure diagnosis and prescription. |
 | [japanese-tech-writing](docs/japanese-tech-writing/) | `docs/japanese-tech-writing` | Writing conventions for Japanese technical prose (Japanese-language skill). |
+| [paper-report](docs/paper-report/) | `docs/paper-report` | Write up a body of work as a technical paper, typeset to PDF with LaTeX, for readers new to the domain. |
 | [sync-docs](docs/sync-docs/) | `docs/sync-docs` | Verify documentation against implementation code. |
 
 ### Design

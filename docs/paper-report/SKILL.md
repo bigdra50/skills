@@ -53,6 +53,7 @@ This skill produces that document from project sources and typesets it as a PDF.
 ## Writing rules
 
 - Every number traces to a source. When a result was not recorded, say so in the text instead of leaving the topic out
+- The report stands on its own. Leave out account names, commit hashes, who or what assembled it, and paths to the Markdown files it was built from (README, notes)
 - The status chapter separates verified, implemented-only, and uncommitted work
 - Define every term and abbreviation at first use. The primer uses the project's real names so it doubles as a map
 - When the sources use coined or informal terms, keep standard terms in the text and add an appendix that maps the two

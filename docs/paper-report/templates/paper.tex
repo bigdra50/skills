@@ -1,7 +1,7 @@
 % 〈表題〉（技術報告）
 % ビルド: tectonic -X compile paper.tex
 % 和文フォントに macOS のヒラギノを使うので、macOS でビルドする。欧文と数式のフォントは Tectonic の配布物から読む。
-% 〈〉で囲んだ箇所と大文字の仮の名前（OWNER/REPO、PATH）を書き換え、使わない節と図は消す。
+% 〈〉で囲んだ箇所と大文字の仮の名前（REPO、PATH）を書き換え、使わない節と図は消す。
 % \code{} の中は ASCII だけにする。url 系の命令は和文フォントへ切り替わらず、和文の文字が欠ける。
 \documentclass[xelatex,ja=standard,a4paper,twocolumn,10pt]{bxjsarticle}
 
@@ -88,10 +88,10 @@
 \vspace{3mm}
 {\itshape\normalsize 〈English title〉\par}
 \vspace{3mm}
+% 所有者の名前、コミットのハッシュ、誰が何をもとに作ったかは書かない。報告書だけで読めるようにする
 {\small\sffamily
-対象: \code{OWNER/REPO} の \code{PATH/}（コミット 〈hash〉）\\
-期間: 〈YYYY-MM-DD〉〜〈MM-DD〉\\
-作成: 〈素材（README、実験ノート、コード）〉をもとに再構成した\par}
+対象: \code{REPO} の \code{PATH/}\\
+期間: 〈YYYY-MM-DD〉〜〈MM-DD〉\par}
 \end{center}
 \vspace{1mm}
 \noindent\colorbox{black!4}{\parbox{\dimexpr\textwidth-2\fboxsep}{\small

@@ -9,7 +9,7 @@ Headings are given in Japanese (the default output language) with the English eq
 - Kind and date: `技術報告　YYYY-MM-DD`
 - Title that says what was done with what: `iPad 1 台の LiDAR と ARKit による XLeRobot の自律走行`
 - English title in italics under it
-- Scope line: which repository, path, and commit the report covers; the period; what the report was rebuilt from
+- Scope line: the repository name and path the report covers, and the period. Leave out the owner or account name, commit hashes, and who or what assembled the report
 - Abstract box spanning both columns, then a keyword line
 
 The abstract carries the whole result in 5-8 sentences: purpose, what was done, the key numbers, what else exists.
@@ -45,7 +45,7 @@ When a decision is driven by a constraint (sensor field of view, bandwidth, cloc
 
 ## 5 実験と結果 (Experiments and results)
 
-- Where and how the experiments ran, and where the raw numbers live (note paths)
+- Where and how the experiments ran
 - One subsection per question, in the order the work answered them
 - Each subsection: question, what was run, a table or chart of the numbers, what the numbers say, problems found on the way
 - Put the external reference next to each comparison (what counted as ground truth)
@@ -76,7 +76,7 @@ When the authors are unknown, cite the title and the identifier (arXiv ID, URL) 
 
 - 付録 A 用語の対応: when the sources use coined or informal terms, map them to standard terms
 - 付録 B 起動の手順: the minimal commands to reproduce, wrapped to fit a column (about 55 characters per line)
-- 付録 C 開発の経過: a dated table built from `git log`, one row per phase
+- 付録 C 開発の経過: a dated table, one row per phase. Build it from `git log`, but leave commit hashes out
 
 ## Checklist before building
 
@@ -85,3 +85,4 @@ When the authors are unknown, cite the title and the identifier (arXiv ID, URL) 
 - [ ] Results that were not recorded are stated as such, not omitted
 - [ ] Status table distinguishes verified, built-only, and uncommitted
 - [ ] No photos of private spaces; no personal names, device IDs, or credentials
+- [ ] No account names, commit hashes, author or tool credits, or paths to the Markdown sources (README, notes)

@@ -30,6 +30,13 @@ Font families that load from the Tectonic bundle:
 | Long identifiers push past the column | Monospace words cannot hyphenate | Load `xurl` so `\code{}` breaks at `/`, `_`, and between letters |
 | `%` or `#` breaks `\code{}` | url commands cannot take them in arguments | Write them with `\texttt{\%}` or rephrase |
 
+## Tables
+
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| Digits in an `S` column look serif inside a sans table | siunitx sets numbers in math mode by default, so the math font replaces the table's font | `\sisetup{mode=match,reset-text-family=false,reset-text-series=false,reset-text-shape=false}`, as in the template |
+| `build.sh` reports sentences in table cells | A cell holds a sentence (a Japanese full stop) | Cut the cell down to a label or a number, and move the explanation to the text or the caption |
+
 ## Layout
 
 | Symptom | Cause | Fix |

@@ -83,6 +83,9 @@ When the authors are unknown, cite the title and the identifier (arXiv ID, URL) 
 - [ ] Every number in the text appears in a source note or log, with the same value
 - [ ] Every figure and table is referenced from the text before it appears
 - [ ] Results that were not recorded are stated as such, not omitted
+- [ ] Compared measurements are drawn as charts; tables keep only values the reader looks up exactly
+- [ ] Table cells hold numbers and short labels, never sentences
+- [ ] Every figure page passes the checklist in [figures.md](figures.md)
 - [ ] Status table distinguishes verified, built-only, and uncommitted
 - [ ] No photos of private spaces; no personal names, device IDs, or credentials
 - [ ] No account names, commit hashes, author or tool credits, or paths to the Markdown sources (README, notes)

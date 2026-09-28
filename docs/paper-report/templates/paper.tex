@@ -34,6 +34,10 @@
 \captionsetup[figure]{skip=6pt}
 \usepackage[colorlinks=true,linkcolor=linkc,citecolor=linkc,urlcolor=linkc]{hyperref}
 \usepackage{xurl}
+% 表の数値は S 列で小数点の位置をそろえる。数値でないセル（見出しなど）は {} で包む。
+% 数字は周りの文字と同じ書体で組む（既定の数式フォントだと、表の sans と字形が混ざる）
+\usepackage{siunitx}
+\sisetup{mode=match,reset-text-family=false,reset-text-series=false,reset-text-shape=false}
 
 \definecolor{linkc}{RGB}{29,80,140}
 % 本報告で作ったもの、強調したい系列に使う色
@@ -71,9 +75,9 @@
   E/.style={anchor=base east,inner sep=0pt},
   t/.style={font=\sffamily\footnotesize},
   tb/.style={font=\sffamily\footnotesize\bfseries},
-  ts/.style={font=\sffamily\scriptsize,text=black!62},
+  ts/.style={font=\sffamily\scriptsize,text=black!70},
   tt/.style={font=\ttfamily\scriptsize},
-  tts/.style={font=\ttfamily\fontsize{6.3}{7.5}\selectfont,text=black!62},
+  tts/.style={font=\ttfamily\fontsize{7}{8.4}\selectfont,text=black!70},
   to/.style={font=\sffamily\footnotesize\bfseries,text=ours},
   tw/.style={font=\sffamily\scriptsize,text=warnc},
 }
@@ -160,12 +164,13 @@
 \begin{table}[tb]
 \caption{〈表の内容〉}\label{tab:parts}
 \footnotesize\sffamily
-\begin{tabularx}{\columnwidth}{@{}l Y@{}}
+% セルには短い語句だけを置く。文は本文に書く（build.sh はセルの中の「。」で失敗する）
+\begin{tabularx}{\columnwidth}{@{}l Y Y@{}}
 \toprule
-要素 & 仕様と役割 \\
+要素 & 仕様 & 役割 \\
 \midrule
-〈要素〉 & 〈仕様〉。〈役割〉 \\
-〈要素〉 & 〈仕様〉。〈役割〉 \\
+〈要素〉 & 〈仕様〉 & 〈役割〉 \\
+〈要素〉 & 〈仕様〉 & 〈役割〉 \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -206,7 +211,7 @@ w = \frac{\sigma_a^2}{\sigma_a^2 + \sigma_b^2}
   point meta=x,
   nodes near coords={\pgfmathprintnumber[fixed,fixed zerofill,precision=2,showpos]{\pgfplotspointmeta}},
   nodes near coords align=horizontal,
-  every node near coord/.append style={font=\sffamily\tiny,text=black!75},
+  every node near coord/.append style={font=\sffamily\scriptsize,text=black!75},
   reverse legend,
 ]
 % 後に描いた系列ほど各グループの上に並ぶ。凡例は reverse legend で上からの順に戻す
@@ -219,6 +224,22 @@ w = \frac{\sigma_a^2}{\sigma_a^2 + \sigma_b^2}
 \caption{〈この図が示す主張を 1 文。〉}
 \label{fig:result}
 \end{figure}
+
+比べる数値は図にし、正確な値を引く必要があるものだけを表\ref{tab:numbers} のように表にする。
+
+\begin{table}[tb]
+\caption{〈表の内容〉。単位は見出しに書く}\label{tab:numbers}
+\footnotesize\sffamily
+% S 列は小数点の位置でそろえる。table-format は「符号、整数の桁数、小数の桁数」
+\begin{tabular}{@{}l S[table-format=2.1] S[table-format=1.2] S[table-format=-1.2]@{}}
+\toprule
+〈条件〉 & {〈量 A〉 [\%]} & {〈量 B〉 [cm]} & {〈差〉 [°]} \\
+\midrule
+〈条件 1〉 & 10.8 & 0.60 & -6.00 \\
+〈条件 2〉 & 0.0 & 0.61 & 3.50 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 %% =========================================================
 \section{考察}\label{sec:discussion}

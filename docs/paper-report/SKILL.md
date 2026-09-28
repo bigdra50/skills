@@ -39,11 +39,14 @@ This skill produces that document from project sources and typesets it as a PDF.
    Drop chapters the material cannot fill.
 3. Plan the figures with [references/figures.md](references/figures.md).
    List the mechanisms the reader must see; each figure makes one claim.
+   Start from the real artifact.
+   Measured comparisons become charts, and the project's own models are rendered; schematics cover the rest.
 4. Copy [templates/paper.tex](templates/paper.tex) and write the report into it.
    Copy any raster data image into `fig/` beside the `.tex`.
 5. Build and check with `scripts/build.sh <file.tex> <pages-dir>`.
-   It compiles, counts overfull boxes, missing glyphs, and undefined references, and renders every page with a contact sheet.
-   Fix what the log reports, then look at the contact sheet and at each figure page zoomed in (`pdftoppm -r 110 -f N -l N`).
+   It compiles and renders every page with a contact sheet.
+   It fails on overfull boxes, missing glyphs, undefined references, sentences inside table cells, and text below 7 pt.
+   Fix what it reports, then check each figure page at 150 dpi against the list in [references/figures.md](references/figures.md).
    Label collisions, hidden overlays, and squeezed table columns only show up this way.
    [references/latex-pitfalls.md](references/latex-pitfalls.md) lists the failures seen so far and their fixes.
 6. Deliver.
@@ -58,6 +61,7 @@ This skill produces that document from project sources and typesets it as a PDF.
 - Define every term and abbreviation at first use. The primer uses the project's real names so it doubles as a map
 - When the sources use coined or informal terms, keep standard terms in the text and add an appendix that maps the two
 - Restructure notes and agent output into short sentences and lists; never paste them
+- Tables hold numbers and short labels. Explanations go in the text or the caption, not in the cells
 - Cite papers with authors, title, venue, and year. When the authors are unknown, cite only the title and identifier
 - Leave out photos of private spaces, personal names, device IDs, and credentials; a map or a diagram carries the same information
 - Japanese prose: plain form (である調), one claim per sentence, no bold in running text, no em dashes. Follow japanese-tech-writing when it is installed
@@ -72,8 +76,8 @@ The template encodes these; change them only when the user asks.
 | Japanese | Body Hiragino Mincho ProN W3 and W6; headings and figures Hiragino Sans W3 and W6 |
 | Latin | Source Serif Pro at 94 %, Source Sans Pro, Source Code Pro at 88 % |
 | Math | STIX Two Math at 96 % |
-| Tables | booktabs and tabularx, caption above |
-| Figures | TikZ and pgfplots, caption below, `figure*` for wide diagrams |
+| Tables | booktabs and tabularx, caption above, siunitx `S` columns align the decimal points, units in the header |
+| Figures | TikZ and pgfplots, caption below, `figure*` for wide diagrams, text at 7 pt or larger |
 | Identifiers | `\code{}`, a robust url-style command that breaks long names; ASCII only |
 
 Hiragino ships with macOS, so the default build needs macOS.
@@ -85,8 +89,8 @@ Use the host's page-publishing tool for this when it has one.
 
 ## Resources
 
-- [templates/paper.tex](templates/paper.tex): preamble, title block, abstract, chapter skeleton, a wide TikZ diagram, a signed bar chart, a status table, references. Builds as is
-- [scripts/build.sh](scripts/build.sh): build, log checks, page images, contact sheet
+- [templates/paper.tex](templates/paper.tex): preamble, title block, abstract, chapter skeleton, a wide TikZ diagram, a signed bar chart, a numeric table, a status table, references. Builds as is
+- [scripts/build.sh](scripts/build.sh): build, log and source checks, page images, contact sheet
 - [references/structure.md](references/structure.md): what each chapter holds, and the pre-build checklist
-- [references/figures.md](references/figures.md): which figures to draw and the TikZ and pgfplots patterns for them
+- [references/figures.md](references/figures.md): which figures to draw, the style rules, the figure-page checklist, and the TikZ and pgfplots patterns
 - [references/latex-pitfalls.md](references/latex-pitfalls.md): symptoms, causes, and fixes

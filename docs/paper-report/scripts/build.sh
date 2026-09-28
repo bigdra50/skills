@@ -3,12 +3,15 @@
 #
 #   build.sh <file.tex> [pages-dir]
 #
-# Prints a one-line summary per check. Exit status is non-zero when the build fails
-# or the log has overfull boxes, missing glyphs, or undefined references.
+# Prints a one-line summary per check. Exit status is non-zero when the build fails,
+# the log has overfull boxes, missing glyphs, or undefined references, or the source has
+# sentences inside table cells or text smaller than 7 pt (check_source.py).
 # Pages are written to <pages-dir>/p-NN.png, and <pages-dir>/sheet.png holds all pages side by side.
 set -euo pipefail
 
 tex=${1:?usage: build.sh <file.tex> [pages-dir]}
+# Resolve this script's directory before the cd below, so a relative invocation still finds check_source.py
+here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 dir=$(cd "$(dirname "$tex")" && pwd)
 base=$(basename "$tex" .tex)
 pages=${2:-"${TMPDIR:-/tmp}/paper-report-${base}"}
@@ -40,6 +43,11 @@ if [ "$overfull" -gt 0 ]; then grep -A1 'Overfull \\hbox' "$log" | head -20; fi
 if [ "$missing" -gt 0 ]; then grep 'Missing character' "$log" | sort | uniq -c | head -20; fi
 rm -f "$log"
 
+# Figure and table rules that can be read off the source (references/figures.md, Style)
+read -r sentences small <<<"$(python3 "$here/check_source.py" "$base.tex")"
+echo "sentences in table cells: $sentences"
+echo "text below 7 pt: $small"
+
 if command -v pdftoppm >/dev/null; then
   rm -rf "$pages" && mkdir -p "$pages"
   pdftoppm -r 45 -png "$base.pdf" "$pages/p"
@@ -62,4 +70,5 @@ else
   echo "pdftoppm not found; open the PDF and check the pages by eye"
 fi
 
-[ "$overfull" -eq 0 ] && [ "$missing" -eq 0 ] && [ "$undefined" -eq 0 ]
+[ "$overfull" -eq 0 ] && [ "$missing" -eq 0 ] && [ "$undefined" -eq 0 ] \
+  && [ "$sentences" -eq 0 ] && [ "$small" -eq 0 ]

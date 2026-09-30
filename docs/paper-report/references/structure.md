@@ -119,7 +119,7 @@ Use the status words defined for the paper's status chapter.
 
 ## Checklist before building
 
-- [ ] Every number in the text appears in a source note or log, with the same value
+- [ ] Every number computed from kept data is quoted with `\fact{key}`; every other number appears in a source note or log, with the same value
 - [ ] Every figure and table is referenced from the text before it appears
 - [ ] Results that were not recorded are stated as such, not omitted
 - [ ] Compared measurements are drawn as charts; tables keep only values the reader looks up exactly

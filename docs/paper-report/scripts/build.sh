@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 # Build a paper-report .tex with Tectonic, check the log, and render the pages for review.
 #
-#   build.sh <file.tex> [pages-dir]
+#   build.sh [--no-facts] <file.tex> [pages-dir]
+#
+# When facts.json sits beside the .tex, facts.py check runs first and the build stops if the
+# scripts now give different values from facts.tex, so no PDF ships numbers the data no longer
+# supports. --no-facts skips that step while iterating on layout.
 #
 # Prints a one-line summary per check. Exit status is non-zero when the build fails,
 # the log has overfull boxes, missing glyphs, or undefined references, or the source has
@@ -9,13 +13,27 @@
 # Pages are written to <pages-dir>/p-NN.png, and <pages-dir>/sheet.png holds all pages side by side.
 set -euo pipefail
 
-tex=${1:?usage: build.sh <file.tex> [pages-dir]}
+facts=1
+if [ "${1:-}" = "--no-facts" ]; then
+  facts=0
+  shift
+fi
+tex=${1:?usage: build.sh [--no-facts] <file.tex> [pages-dir]}
 # Resolve this script's directory before the cd below, so a relative invocation still finds check_source.py
 here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 dir=$(cd "$(dirname "$tex")" && pwd)
 base=$(basename "$tex" .tex)
 pages=${2:-"${TMPDIR:-/tmp}/paper-report-${base}"}
 cd "$dir"
+
+if [ -f facts.json ]; then
+  if [ "$facts" -eq 0 ]; then
+    echo "facts: skipped (--no-facts)"
+  elif ! python3 "$here/facts.py" check .; then
+    echo "facts: stopped before the build; run 'python3 $here/facts.py update $dir' and reread the lines above"
+    exit 1
+  fi
+fi
 
 # Tectonic downloads packages and fonts on first use. A dropped connection shows up as
 # "font ... cannot be found", so retry once before treating it as a real error.

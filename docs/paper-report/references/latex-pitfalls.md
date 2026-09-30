@@ -51,6 +51,14 @@ Font families that load from the Tectonic bundle:
 A box filled with white hides anything drawn before it.
 Draw translucent overlays (a field-of-view wedge, a highlight) after the boxes they cross, with `fill opacity`.
 
+## Numbers from facts.tex
+
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| `Undefined fact` stops the build | The .tex quotes a key that `facts.tex` does not define | Run `scripts/facts.py update`, or fix the key |
+| A value prints as `\fact{key}` | `\fact` sits inside `\code{}`, which takes its argument verbatim | Quote the value outside `\code{}`; `facts.py` lists these lines |
+| `build.sh` stops before Tectonic with `facts: changed ...` | The scripts now give a different value from `facts.tex` | Run `facts.py update` and reread the listed lines. `build.sh --no-facts` skips the check while fixing layout |
+
 ## Checking
 
 - The log is the ground truth for overfull boxes, missing glyphs, and undefined references. `scripts/build.sh` counts all three

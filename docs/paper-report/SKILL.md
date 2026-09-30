@@ -43,6 +43,8 @@ This skill produces that document from project sources and typesets it as a PDF.
    Delegate long notes to sub-agents and ask them for claims with their numbers and `file:line`.
    Keep a fact sheet: claim, value, source, and status.
    Status is one of: verified on the real system, implemented without a recorded result, uncommitted, not recorded.
+   For a number computed from data the repository keeps, write a script that prints it instead of copying the value.
+   [references/facts.md](references/facts.md) shows how the .tex quotes it.
 2. Outline with the chapter skeleton for the kind in [references/structure.md](references/structure.md).
    Drop chapters the material cannot fill.
 3. Plan the figures with [references/figures.md](references/figures.md).
@@ -54,6 +56,8 @@ This skill produces that document from project sources and typesets it as a PDF.
 5. Build and check with `scripts/build.sh <file.tex> <pages-dir>`.
    It compiles and renders every page with a contact sheet.
    It fails on overfull boxes, missing glyphs, undefined references, sentences inside table cells, and text below 7 pt.
+   When `facts.json` sits beside the .tex, it first reruns the scripts and stops if a quoted value has moved.
+   Run `scripts/facts.py update`, then reread the lines it lists, since the sentence around a number may no longer hold.
    Fix what it reports, then check each figure page at 150 dpi against the list in [references/figures.md](references/figures.md).
    Label collisions, hidden overlays, and squeezed table columns only show up this way.
    [references/latex-pitfalls.md](references/latex-pitfalls.md) lists the failures seen so far and their fixes.
@@ -64,7 +68,7 @@ This skill produces that document from project sources and typesets it as a PDF.
 
 ## Writing rules
 
-- Every number traces to a source. When a result was not recorded, say so in the text instead of leaving the topic out
+- Every number traces to a source. Numbers computed from data the repository keeps are quoted with `\fact{key}`; the rest are typed, with their source in the fact sheet. When a result was not recorded, say so in the text instead of leaving the topic out
 - The report stands on its own. Leave out account names, commit hashes, who or what assembled it, and paths to the Markdown files it was built from (README, notes)
 - The status chapter (現状と今後 in a paper, 残り in a work report) separates verified, implemented-only, and uncommitted work
 - Define every term and abbreviation at first use. The primer uses the project's real names so it doubles as a map
@@ -88,6 +92,7 @@ The template encodes these; change them only when the user asks.
 | Tables | booktabs and tabularx, caption above, siunitx `S` columns align the decimal points, units in the header |
 | Figures | TikZ and pgfplots, caption below, `figure*` for wide diagrams, text at 7 pt or larger |
 | Identifiers | `\code{}`, a robust url-style command that breaks long names; ASCII only |
+| Computed numbers | `\fact{key}`, read from the `facts.tex` that `scripts/facts.py` writes |
 
 Hiragino ships with macOS, so the default build needs macOS.
 Elsewhere, replace the two `\setja...font` lines with installed Japanese fonts.
@@ -98,8 +103,10 @@ Use the host's page-publishing tool for this when it has one.
 
 ## Resources
 
-- [templates/paper.tex](templates/paper.tex): preamble, title block, abstract, chapter skeleton, a wide TikZ diagram, a signed bar chart, a numeric table, a status table, references. Builds as is
-- [scripts/build.sh](scripts/build.sh): build, log and source checks, page images, contact sheet
+- [templates/paper.tex](templates/paper.tex): preamble with `\fact`, title block, abstract, chapter skeleton, a wide TikZ diagram, a signed bar chart, a numeric table, a status table, references. Builds as is
+- [scripts/build.sh](scripts/build.sh): the facts check, build, log and source checks, page images, contact sheet
+- [scripts/facts.py](scripts/facts.py): runs the commands in `facts.json`, writes `facts.tex`, and checks that the quoted numbers still match the data
 - [references/structure.md](references/structure.md): what each chapter holds, and the pre-build checklist
 - [references/figures.md](references/figures.md): which figures to draw, the style rules, the figure-page checklist, and the TikZ and pgfplots patterns
 - [references/latex-pitfalls.md](references/latex-pitfalls.md): symptoms, causes, and fixes
+- [references/facts.md](references/facts.md): how a script's output becomes a number in the .tex, and what the check reports

@@ -52,6 +52,15 @@
 \DeclareUrlCommand\codeurl{\urlstyle{tt}}
 \DeclareRobustCommand{\code}{\codeurl}
 
+% データから計算した数値は、facts.py が書き出す facts.tex から \fact{キー} で引用する（references/facts.md）。
+% 定義の無いキーを引用するとビルドが止まる。facts.tex が無ければ読み飛ばすので、使わない報告はこのままでよい
+\makeatletter
+\newcommand{\factdef}[2]{\expandafter\def\csname fact@#1\endcsname{#2}}
+\newcommand{\fact}[1]{\ifcsname fact@#1\endcsname\csname fact@#1\endcsname\else\fact@undefined{#1}\fi}
+\newcommand{\fact@undefined}[1]{\PackageError{facts}{Undefined fact `#1'}{Run facts.py update, or fix the key in the .tex}}
+\makeatother
+\InputIfFileExists{facts.tex}{}{}
+
 \setlist{nosep,leftmargin=1.4em,topsep=3pt,itemsep=1pt}
 \setlength{\emergencystretch}{3em}
 \renewcommand{\arraystretch}{1.18}

@@ -23,6 +23,7 @@ The build runs the script again and stops when a quoted value has moved.
 
 - `run`: one line, run by bash in the report directory. `cwd` moves it, relative to the report directory
 - `requires`: paths relative to the report directory. When one is missing, for example raw logs kept on another machine, the command is skipped and the values it wrote before are kept
+  - List only data outside the repository here. A missing file inside the repository is an error, and listing it would skip the check without notice
 
 ## What a command prints
 
@@ -33,6 +34,9 @@ The build runs the script again and stops when a quoted value has moved.
 
 A `--facts` flag beside the script's human-readable output keeps one script for both.
 
+Have each measurement write its summary to a file in `fig/` when it runs, not only to stdout.
+A value that exists only in a terminal cannot be quoted later without measuring again.
+
 ## In the .tex
 
 The template defines `\fact` and `\factdef` and reads `facts.tex` when it exists.
@@ -41,6 +45,9 @@ The template defines `\fact` and `\factdef` and reads `facts.tex` when it exists
 - Running text, captions, and section titles, including their PDF bookmarks
 - pgfplots coordinates
 - siunitx `S` columns. The value aligns on the decimal point like a typed number (checked with siunitx 3.0.49)
+
+When the same value appears at two precisions, keep one key and round in the .tex: `\num[round-mode=places,round-precision=1]{\fact{p99}}` prints 14.2 for a value of 14.20.
+A value in exponent form, such as `6.9e-5`, prints as 6.9 × 10⁻⁵ with `\num{\fact{key}}`, in text and in tables.
 
 Two uses fail:
 

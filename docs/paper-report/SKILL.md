@@ -5,11 +5,14 @@ description: |
   document in technical-paper form: title block, abstract, numbered chapters from background
   and a primer through method, results, discussion, and current status, figures drawn from the
   real mechanism, tables of measured values, references, and appendices.
+  A work report, which records what happened and what was done, uses a shorter chapter set:
+  what happened, cause, fix, verification, and what remains.
   Output is LaTeX compiled to PDF with Tectonic (A4 two-column, Hiragino with the Source font
   family, TikZ and pgfplots figures), checked by rendering every page.
   Use when the user wants to catch up on, explain, or hand over work to a reader who does not
   know the domain yet: 「論文形式でまとめて」「論文っぽく」「技術報告にまとめて」「LaTeX で書いて」
-  「PDF の資料にして」「実験内容を解説して」「キャッチアップ用の資料」, or "write it up as a paper".
+  「PDF の資料にして」「実験内容を解説して」「キャッチアップ用の資料」「作業報告にまとめて」,
+  or "write it up as a paper".
   Not for slides, not for docs that live in a repository (docs-architect),
   and not for polishing one Markdown file (japanese-tech-writing).
 user-invocable: true
@@ -26,7 +29,12 @@ This skill produces that document from project sources and typesets it as a PDF.
 
 - Reader and goal: one sentence such as "a reader who has never used ROS 2 understands the current deliverables". Ask only when the request does not imply it
 - Sources: repositories, design notes, experiment logs, `git log`, and the uncommitted diff
-- Location: next to the sources, for example `<repo>/<area>/report/`, left untracked. Ask before committing it. If the repository is public, point out any private details (room layouts, names) before it is committed
+- Kind: decide by why the reader will come back to the document
+  - Paper: explains a mechanism or argues a plan. It is revised when the system or the plan changes
+  - Work report: records what happened on a date and what was done about it (an incident, a setup, a migration). It stays as written; only errors are corrected
+  - The two kinds use different chapter sets in [references/structure.md](references/structure.md)
+- Location: follow the repository's rule for reports when it has one (an index file, or a document that says where reports go). Add the new report to any index. Otherwise put the report next to the sources, for example `<repo>/<area>/report/`
+- Committing: ask first, and follow the repository's rule on what to commit, such as whether the PDF goes in with the `.tex`. If the repository is public, point out any private details (room layouts, names) before it is committed
 
 ## Workflow
 
@@ -35,7 +43,7 @@ This skill produces that document from project sources and typesets it as a PDF.
    Delegate long notes to sub-agents and ask them for claims with their numbers and `file:line`.
    Keep a fact sheet: claim, value, source, and status.
    Status is one of: verified on the real system, implemented without a recorded result, uncommitted, not recorded.
-2. Outline with the chapter skeleton in [references/structure.md](references/structure.md).
+2. Outline with the chapter skeleton for the kind in [references/structure.md](references/structure.md).
    Drop chapters the material cannot fill.
 3. Plan the figures with [references/figures.md](references/figures.md).
    List the mechanisms the reader must see; each figure makes one claim.
@@ -51,13 +59,14 @@ This skill produces that document from project sources and typesets it as a PDF.
    [references/latex-pitfalls.md](references/latex-pitfalls.md) lists the failures seen so far and their fixes.
 6. Deliver.
    Open the PDF (`open` on macOS) and send it with the host's file-sending tool when there is one.
+   When the repository keeps an index of reports, add the new report to it.
    Report in a few lines: where the files are, the build command, and what could not be verified from the sources.
 
 ## Writing rules
 
 - Every number traces to a source. When a result was not recorded, say so in the text instead of leaving the topic out
 - The report stands on its own. Leave out account names, commit hashes, who or what assembled it, and paths to the Markdown files it was built from (README, notes)
-- The status chapter separates verified, implemented-only, and uncommitted work
+- The status chapter (現状と今後 in a paper, 残り in a work report) separates verified, implemented-only, and uncommitted work
 - Define every term and abbreviation at first use. The primer uses the project's real names so it doubles as a map
 - When the sources use coined or informal terms, keep standard terms in the text and add an appendix that maps the two
 - Restructure notes and agent output into short sentences and lists; never paste them

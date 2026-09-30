@@ -1,12 +1,14 @@
 # Chapter structure
 
-The skeleton below is the default.
+Two kinds of report use different chapter sets.
+A paper, the default, uses the skeleton from the title block through the appendices below.
+A work report uses the shorter set under "Work report" near the end of this file.
 Keep the order, drop a chapter that would have no content, and never pad one to fill the slot.
 Headings are given in Japanese (the default output language) with the English equivalent in parentheses.
 
 ## Title block
 
-- Kind and date: `技術報告　YYYY-MM-DD`
+- Kind and date: `技術報告　YYYY-MM-DD` for a paper, `作業報告　YYYY-MM-DD` for a work report
 - Title that says what was done with what: `iPad 1 台の LiDAR と ARKit による XLeRobot の自律走行`
 - English title in italics under it
 - Scope line: the repository name and path the report covers, and the period. Leave out the owner or account name, commit hashes, and who or what assembled the report
@@ -77,6 +79,43 @@ When the authors are unknown, cite the title and the identifier (arXiv ID, URL) 
 - 付録 A 用語の対応: when the sources use coined or informal terms, map them to standard terms
 - 付録 B 起動の手順: the minimal commands to reproduce, wrapped to fit a column (about 55 characters per line)
 - 付録 C 開発の経過: a dated table, one row per phase. Build it from `git log`, but leave commit hashes out
+
+## Work report (作業報告)
+
+A work report answers four questions: what happened, why, what was done, and whether it worked.
+Readers come back to it to check the history, so it stays as written and is kept shorter than a paper.
+The title block and the abstract follow the rules above.
+The abstract states the event, the cause, the fix, and how the fix was checked, with the key numbers.
+
+### 1 経緯 (What happened)
+
+- The trigger: a symptom with when and where it appeared and what it affected, or the goal of a setup or a migration
+- What was checked or done, in the order it happened. For an investigation, give each hypothesis, what was measured, and why it was kept or ruled out; a table fits
+- Define terms inline at first use. Add a short primer paragraph only when the cause cannot be followed without it
+
+### 2 原因 (Cause)
+
+The mechanism, with the numbers that pin it down.
+Draw a figure when the mechanism has a path or a threshold.
+For work that was not a failure (a setup, a migration), title the chapter 判明したこと (Findings) and put the problems met and what was learned here.
+
+### 3 対処 (Fix)
+
+What was changed and where (file, setting, procedure), and why this option over the alternatives.
+
+### 4 確認 (Verification)
+
+What was run after the fix, the numbers before and after, and what the check does not cover.
+
+### 5 残り (What remains)
+
+Open problems and points not verified.
+Use the status words defined for the paper's status chapter.
+
+### Appendices of a work report
+
+- 付録 A 経過: a dated table of the day or the period, one row per step
+- 付録 B 用語の対応 and 付録 C 再現の手順: as for a paper
 
 ## Checklist before building
 

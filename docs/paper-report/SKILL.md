@@ -33,7 +33,9 @@ This skill produces that document from project sources and typesets it as a PDF.
   - Paper: explains a mechanism or argues a plan. It is revised when the system or the plan changes
   - Work report: records what happened on a date and what was done about it (an incident, a setup, a migration). It stays as written; only errors are corrected
   - The two kinds use different chapter sets in [references/structure.md](references/structure.md)
-- Location: follow the repository's rule for reports when it has one (an index file, or a document that says where reports go). Add the new report to any index. Otherwise put the report next to the sources, for example `<repo>/<area>/report/`
+- Location: follow the repository's rule for reports when it has one (an index file, or a document that says where reports go). Without one, put a paper in `reports/papers/<topic>/` and a work report in `reports/work/<topic>-<YYYYMMDD>/`. Add the new report to any index
+  - A paper's directory carries no date, because the paper is revised in place. Before starting a paper, look for one on the same topic and revise it instead of adding a second
+  - A work report's directory carries the date of the events it records, and each new event gets its own directory
 - Committing: ask first, and follow the repository's rule on what to commit, such as whether the PDF goes in with the `.tex`. If the repository is public, point out any private details (room layouts, names) before it is committed
 
 ## Workflow
@@ -51,7 +53,8 @@ This skill produces that document from project sources and typesets it as a PDF.
    List the mechanisms the reader must see; each figure makes one claim.
    Start from the real artifact.
    Measured comparisons become charts, and the project's own models are rendered; schematics cover the rest.
-4. Copy [templates/paper.tex](templates/paper.tex) and write the report into it.
+4. Copy [templates/paper.tex](templates/paper.tex) into the report's directory and write the report into it.
+   To revise a paper, edit its `.tex` where it is; the directory keeps its name.
    Copy any raster data image into `fig/` beside the `.tex`.
 5. Build and check with `scripts/build.sh <file.tex> <pages-dir>`.
    It compiles and renders every page with a contact sheet.
@@ -63,7 +66,7 @@ This skill produces that document from project sources and typesets it as a PDF.
    [references/latex-pitfalls.md](references/latex-pitfalls.md) lists the failures seen so far and their fixes.
 6. Deliver.
    Open the PDF (`open` on macOS) and send it with the host's file-sending tool when there is one.
-   When the repository keeps an index of reports, add the new report to it.
+   When the repository keeps an index of reports, add the new report to it, or update the revised paper's row.
    Report in a few lines: where the files are, the build command, and what could not be verified from the sources.
 
 ## Writing rules

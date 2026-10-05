@@ -99,16 +99,6 @@ They include `survey`, `ask`, `survey-paper`, and `inbox-organize`, and ship alo
 | [design-mockup](design/design-mockup/) | `design/design-mockup` | Generate interactive HTML mockups with viewport presets. |
 | [drawio](design/drawio/) | `design/drawio` | Generate draw.io diagrams with cross-platform CLI export. |
 
-### Jev
-
-For [Jev](https://docs.typesafe.ai/introduction), TypeSafe's System One model.
-The skill here decides whether Jev fits.
-To build with Jev, use TypeSafe's official [typesafe-ai skill](https://github.com/typesafe-ai/skills).
-
-| Skill | Install path | Description |
-|---|---|---|
-| [jev-fit](jev/jev-fit/) | `jev/jev-fit` | Consult on whether Jev would improve the work at hand. Screens each decision point, and "nothing fits" is a valid result. |
-
 ## For Unity / C# Development
 
 Unity and C# skills are project-scoped.

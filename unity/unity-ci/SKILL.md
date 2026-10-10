@@ -185,5 +185,5 @@ jobs:
 ## Related skills
 
 - `asmdef-lint` — a cheap pre-build assembly-structure check that can run before compile.
-- `project-bootstrap` — sets up the project layout and unilyze baseline this pipeline gates against.
-- `unity-review/review-testing` — deeper analysis of the test posture this pipeline exercises.
+- `unilyze-setup` — first snapshot, SARIF, badges, and the baseline this pipeline gates against.
+- `quality-audit` (from unilyze) — metric-backed audit of the code this pipeline compiles and tests.

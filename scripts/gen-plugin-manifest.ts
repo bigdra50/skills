@@ -22,7 +22,7 @@ const BUNDLES: Bundle[] = [
     root: "unity",
     name: "bigdra50-unity",
     description:
-      "Unity / C# development skills — project bootstrap, CI, coding guides, the review system, and reviewer perspectives.",
+      "Unity / C# development skills — asmdef lint, CI, coding guides, and unilyze setup.",
     version: "0.1.0",
   },
   {

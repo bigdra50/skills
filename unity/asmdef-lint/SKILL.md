@@ -116,6 +116,6 @@ Severity: `dependency-direction` and `versionDefines` are errors (break the grap
 
 ## Boundaries
 
-- Do NOT restructure assemblies or edit `.asmdef` files. Flag only; moving types between assemblies is `unity-review/review-architecture` + a human decision.
-- Do NOT evaluate code quality, per-type metrics, or coupling numbers — that is `unity-review/review-metrics`.
+- Do NOT restructure assemblies or edit `.asmdef` files. Flag only; moving types between assemblies is a human decision.
+- Do NOT evaluate code quality, per-type metrics, or coupling numbers — that is `quality-audit` (from unilyze).
 - Do NOT resolve GUID references or run the Unity editor. This is a static text/JSON pass; if a project uses GUID references, note it and defer the direction check.

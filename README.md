@@ -36,7 +36,8 @@ Language / domain agnostic. Install globally via `apm install -g`.
 
 ### Review
 
-For code review, use the built-in `/code-review`; for Unity/C# projects, use the [Unity review system](#unity--c-review-system).
+For code review, use the built-in `/code-review`.
+For Unity/C# quality work, use [unilyze](https://github.com/bigdra50/unilyze) (`quality-audit` / `refactor-loop`) rather than a dedicated review skill here.
 To iterate until findings stop, wrap a review in `/goal` rather than reaching for a loop skill.
 
 | Skill | Install path | Description |
@@ -127,7 +128,11 @@ Then run `apm install` in the project root.
 
 `bigdra50/skills/unity` is a [plugin bundle](unity/.claude-plugin/plugin.json) covering
 every skill listed below. Individual skills still resolve by path
-(`bigdra50/skills/unity/review-triage`) when you want a subset instead.
+(`bigdra50/skills/unity/asmdef-lint`) when you want a subset instead.
+
+Quality audit and refactor loops live in [unilyze](https://github.com/bigdra50/unilyze)
+(`quality-audit` / `refactor-loop`), not in this bundle.
+Editor operations use the official [unity-cli](https://github.com/Unity-Technologies/skills) skill.
 
 ### Recommended plugins (project-scoped)
 
@@ -138,40 +143,13 @@ claude plugin install unity-cli@unity-tools --scope project
 claude plugin install csharp-lsp@claude-plugins-official --scope project
 ```
 
-### Unity / C# Review System
-
-Uses [unilyze](https://github.com/bigdra50/unilyze) for static analysis and [unity-cli](https://github.com/bigdra50/unity-cli) for project metadata.
-
-Start with `review-triage`, then run the observation skills it recommends.
-Use `review-weekly` to orchestrate all review skills together.
-
-| Skill | Description |
-|---|---|
-| [review-triage](unity/review-triage/) | Day 0 scorecard: CodeHealth, assembly structure, test posture, top 3 risks. |
-| [review-metrics](unity/review-metrics/) | Per-type metric deep-dive with unilyze evidence packs. |
-| [review-architecture](unity/review-architecture/) | Assembly (asmdef) structure: dependency direction, DfMS, cyclic deps. |
-| [review-hotspot](unity/review-hotspot/) | Git churn x complexity refactoring priorities. |
-| [review-duplication](unity/review-duplication/) | Code clone detection and classification. |
-| [review-performance](unity/review-performance/) | Unity hot-path smells, GC allocation, Burst/DOTS readiness. |
-| [review-safety](unity/review-safety/) | Async patterns, exception handling, resource disposal. |
-| [review-testing](unity/review-testing/) | Test posture: EditMode/PlayMode coverage, CI, test design quality. |
-| [review-unity-specific](unity/review-unity-specific/) | Unity-specific gotchas no static analyzer catches. |
-| [review-weekly](unity/review-weekly/) | Weekly orchestrator that runs all observation skills, dispatches perspectives, and diffs KPIs. |
-
-`review-weekly` dispatches the perspective sub-skills in parallel.
-They live under `unity/perspectives/`: `unity-architect`, `performance-engineer`, `xr-specialist`, and `test-engineer`.
-
 ### Unity Development Skills
 
 | Skill | Description |
 |---|---|
 | [asmdef-lint](unity/asmdef-lint/) | Assembly Definition structure validation: naming, dependency direction, test assemblies. |
-| [project-bootstrap](unity/project-bootstrap/) | Day 0 project setup checklist: asmdef structure, .editorconfig, CI, unilyze baseline. |
-| [visual-test](unity/visual-test/) | UXML resolvedStyle comparison for Figma-to-Unity visual testing. |
-| [unity-playmode-test](unity/unity-playmode-test/) | Unity UI Toolkit PlayMode test patterns with trap avoidance. |
 | [unity-csharp-guide](unity/unity-csharp-guide/) | C# in Unity patterns AI gets wrong: serialization, async/await, IL2CPP, hot-path allocations. |
 | [unilyze-setup](unity/unilyze-setup/) | Set up unilyze: first snapshot, CI integration, SARIF, badges, baselines. |
-| [unity-cli-setup](unity/unity-cli-setup/) | Set up unity-cli (`u` command): installation, relay server, instance management. |
 | [unity-ci](unity/unity-ci/) | GitHub Actions CI/CD for Unity: GameCI, test matrix, unilyze quality gate. |
 
 ## For 3DCG Development
